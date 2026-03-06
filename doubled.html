@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Double D — Deep Tech Due Diligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:   #0D1B2A;
+    --ink:    #12263F;
+    --blue:   #1B5FAD;
+    --sky:    #3B9EE8;
+    --lime:   #B8F050;
+    --white:  #F5F7FA;
+    --mist:   #E8EEF5;
+    --steel:  #7A8FA8;
+    --danger: #E85C3B;
+    --amber:  #F0A030;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .display { font-family: 'Syne', sans-serif; font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+  .heading  { font-family: 'Syne', sans-serif; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+  .label    { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 3rem;
+    background: rgba(13,27,42,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem;
+    color: var(--white); text-decoration: none; letter-spacing: -0.03em;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .nav-logo .dd-mark {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 2rem; height: 2rem; background: var(--lime); border-radius: 4px;
+    color: var(--navy); font-size: 0.9rem; font-weight: 800; letter-spacing: -0.05em;
+  }
+
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+  .nav-links a {
+    color: var(--steel); text-decoration: none; font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    background: var(--lime); color: var(--navy);
+    padding: 0.55rem 1.4rem; border-radius: 6px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem;
+    text-decoration: none; transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ── PAGES ── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ══════════════════════════════
+     LANDING PAGE
+  ══════════════════════════════ */
+  #landing { background: var(--navy); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 8rem 3rem 4rem;
+    gap: 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; top: -20%; right: -10%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(27,95,173,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -10%; left: 20%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(184,240,80,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(184,240,80,0.1); border: 1px solid rgba(184,240,80,0.25);
+    padding: 0.4rem 0.9rem; border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+  .hero-eyebrow .dot { width: 6px; height: 6px; background: var(--lime); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+
+  .hero-eyebrow span { color: var(--lime); font-size: 0.78rem; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.08em; }
+
+  .hero-title { font-size: clamp(2.8rem, 5vw, 4.5rem); margin-bottom: 1.5rem; }
+  .hero-title em { font-style: normal; color: var(--sky); }
+
+  .hero-body {
+    color: var(--steel); font-size: 1.1rem; line-height: 1.7;
+    max-width: 480px; margin-bottom: 2.5rem; font-weight: 300;
+  }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--lime); color: var(--navy);
+    padding: 0.85rem 2rem; border-radius: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+    border: none; cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { transform: translateY(-2px); opacity: 0.9; }
+
+  .btn-secondary {
+    background: transparent; color: var(--white);
+    padding: 0.85rem 2rem; border-radius: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.95rem;
+    border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
+
+  /* Hero Visual */
+  .hero-visual { position: relative; }
+
+  .hero-card {
+    background: var(--ink);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 1.5rem;
+    animation: floatUp 0.8s ease both;
+  }
+  @keyframes floatUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  .hero-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+  .hero-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .trl-badge {
+    background: rgba(59,158,232,0.15); border: 1px solid rgba(59,158,232,0.3);
+    color: var(--sky); padding: 0.25rem 0.7rem; border-radius: 100px;
+    font-size: 0.75rem; font-family: 'Syne', sans-serif; font-weight: 700;
+  }
+
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+  .score-item { background: rgba(255,255,255,0.04); border-radius: 10px; padding: 0.85rem; }
+  .score-label { font-size: 0.72rem; color: var(--steel); margin-bottom: 0.4rem; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.08em; }
+  .score-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+  .score-fill.high   { background: var(--lime); }
+  .score-fill.medium { background: var(--amber); }
+  .score-fill.low    { background: var(--danger); }
+  .score-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; margin-top: 0.35rem; }
+
+  .verdict-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.9rem; background: rgba(184,240,80,0.08);
+    border: 1px solid rgba(184,240,80,0.2); border-radius: 10px;
+  }
+  .verdict-label { font-size: 0.78rem; color: var(--steel); font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.08em; }
+  .verdict-value { color: var(--lime); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+
+  .mini-cards { display: flex; gap: 0.75rem; margin-top: 0.75rem; }
+  .mini-card {
+    flex: 1; background: var(--ink); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 0.85rem; animation: floatUp 0.8s ease both;
+  }
+  .mini-card:nth-child(2) { animation-delay: 0.1s; }
+  .mini-card:nth-child(3) { animation-delay: 0.2s; }
+  .mini-icon { font-size: 1.2rem; margin-bottom: 0.4rem; }
+  .mini-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; margin-bottom: 0.2rem; }
+  .mini-sub { font-size: 0.72rem; color: var(--steel); }
+
+  /* How it works */
+  .section { padding: 6rem 3rem; }
+  .section-label { color: var(--lime); margin-bottom: 0.75rem; }
+  .section-title { font-size: clamp(1.8rem, 3vw, 2.8rem); margin-bottom: 1rem; }
+  .section-sub { color: var(--steel); font-size: 1rem; max-width: 520px; line-height: 1.7; font-weight: 300; }
+
+  .steps-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; margin-top: 3.5rem; }
+
+  .step {
+    position: relative; padding: 1.75rem;
+    background: var(--ink); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .step:hover { border-color: rgba(59,158,232,0.3); transform: translateY(-4px); }
+
+  .step-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.5rem;
+    color: rgba(255,255,255,0.06); line-height: 1; margin-bottom: 1rem;
+  }
+  .step-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
+  .step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+  .step-body { font-size: 0.88rem; color: var(--steel); line-height: 1.6; font-weight: 300; }
+
+  .step-connector {
+    position: absolute; top: 2.5rem; right: -0.85rem;
+    width: 1.7rem; height: 2px; background: rgba(255,255,255,0.08);
+    z-index: 1;
+  }
+  .step:last-child .step-connector { display: none; }
+
+  /* Two sides */
+  .two-sides {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-top: 3.5rem;
+  }
+  .side-card {
+    border-radius: 16px; padding: 2.5rem;
+    position: relative; overflow: hidden;
+    cursor: pointer; transition: transform 0.3s;
+  }
+  .side-card:hover { transform: translateY(-4px); }
+
+  .side-card.firm {
+    background: linear-gradient(135deg, #0D2545 0%, #163a6b 100%);
+    border: 1px solid rgba(59,158,232,0.2);
+  }
+  .side-card.researcher {
+    background: linear-gradient(135deg, #0d2a15 0%, #1a4a25 100%);
+    border: 1px solid rgba(184,240,80,0.2);
+  }
+
+  .side-card::before {
+    content: ''; position: absolute; top: -30%; right: -10%;
+    width: 200px; height: 200px; border-radius: 50%;
+    pointer-events: none;
+  }
+  .side-card.firm::before    { background: radial-gradient(circle, rgba(59,158,232,0.15) 0%, transparent 70%); }
+  .side-card.researcher::before { background: radial-gradient(circle, rgba(184,240,80,0.12) 0%, transparent 70%); }
+
+  .side-tag {
+    display: inline-block; padding: 0.3rem 0.8rem; border-radius: 100px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.72rem;
+    letter-spacing: 0.1em; margin-bottom: 1.25rem;
+  }
+  .side-card.firm .side-tag     { background: rgba(59,158,232,0.15); color: var(--sky); border: 1px solid rgba(59,158,232,0.3); }
+  .side-card.researcher .side-tag { background: rgba(184,240,80,0.12); color: var(--lime); border: 1px solid rgba(184,240,80,0.25); }
+
+  .side-title { font-size: 1.6rem; margin-bottom: 1rem; }
+  .side-body  { color: var(--steel); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; font-weight: 300; }
+
+  .side-perks { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .side-perks li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.88rem; color: rgba(255,255,255,0.75); }
+  .side-perks li::before { content: '✓'; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .side-card.firm .side-perks li::before     { color: var(--sky); }
+  .side-card.researcher .side-perks li::before { color: var(--lime); }
+
+  .side-cta {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+    text-decoration: none; transition: gap 0.2s;
+    border: none; background: none; cursor: pointer; padding: 0;
+  }
+  .side-cta:hover { gap: 0.8rem; }
+  .side-card.firm .side-cta     { color: var(--sky); }
+  .side-card.researcher .side-cta { color: var(--lime); }
+
+  /* Stats strip */
+  .stats-strip {
+    padding: 3rem;
+    background: var(--ink);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: grid; grid-template-columns: repeat(4,1fr);
+    gap: 1rem; text-align: center;
+  }
+  .stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem; color: var(--lime); line-height: 1; margin-bottom: 0.4rem; }
+  .stat-label { font-size: 0.82rem; color: var(--steel); }
+
+  /* Footer */
+  footer {
+    padding: 2.5rem 3rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  footer p { font-size: 0.82rem; color: var(--steel); }
+
+  /* ══════════════════════════════
+     RESEARCHER PAGE
+  ══════════════════════════════ */
+  #researcher { background: var(--navy); }
+
+  .page-hero {
+    padding: 9rem 3rem 5rem;
+    background: linear-gradient(160deg, #0d2a15 0%, var(--navy) 60%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: relative; overflow: hidden;
+  }
+  .page-hero::before {
+    content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(184,240,80,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .page-hero-inner { max-width: 640px; position: relative; }
+  .page-tag {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(184,240,80,0.1); border: 1px solid rgba(184,240,80,0.25);
+    padding: 0.4rem 0.9rem; border-radius: 100px; margin-bottom: 1.5rem;
+  }
+  .page-tag span { color: var(--lime); font-size: 0.78rem; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.08em; }
+  .page-tag.blue { background: rgba(59,158,232,0.1); border-color: rgba(59,158,232,0.25); }
+  .page-tag.blue span { color: var(--sky); }
+
+  .page-title { font-size: clamp(2.2rem, 4vw, 3.5rem); margin-bottom: 1.25rem; }
+  .page-body  { color: var(--steel); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2.5rem; font-weight: 300; }
+
+  /* Process timeline */
+  .timeline { padding: 5rem 3rem; }
+  .timeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.06); border-radius: 16px; overflow: hidden; margin-top: 3rem; }
+
+  .timeline-item {
+    background: var(--ink); padding: 2.25rem;
+    transition: background 0.3s;
+  }
+  .timeline-item:hover { background: #172535; }
+
+  .tl-step { color: var(--lime); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.12em; margin-bottom: 0.75rem; }
+  .tl-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.6rem; }
+  .tl-body  { font-size: 0.88rem; color: var(--steel); line-height: 1.6; font-weight: 300; }
+
+  /* Earnings */
+  .earnings-section { padding: 5rem 3rem; background: var(--ink); }
+  .earnings-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-top: 3rem; }
+
+  .earn-card {
+    background: var(--navy); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 2rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .earn-card:hover { border-color: rgba(184,240,80,0.3); transform: translateY(-3px); }
+  .earn-card.featured { border-color: rgba(184,240,80,0.3); background: linear-gradient(135deg, #0d2a15 0%, var(--navy) 100%); }
+
+  .earn-amount { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem; color: var(--lime); line-height: 1; margin-bottom: 0.3rem; }
+  .earn-type   { font-size: 0.82rem; color: var(--steel); margin-bottom: 1rem; }
+  .earn-desc   { font-size: 0.88rem; color: rgba(255,255,255,0.7); line-height: 1.6; font-weight: 300; }
+  .earn-tag    {
+    display: inline-block; margin-top: 1rem;
+    background: rgba(184,240,80,0.1); color: var(--lime);
+    border: 1px solid rgba(184,240,80,0.2); border-radius: 100px;
+    font-size: 0.72rem; font-family: 'Syne', sans-serif; font-weight: 700;
+    padding: 0.25rem 0.7rem; letter-spacing: 0.06em;
+  }
+
+  /* Requirements */
+  .requirements { padding: 5rem 3rem; }
+  .req-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 3rem; }
+  .req-item {
+    background: var(--ink); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px; padding: 1.5rem;
+  }
+  .req-icon  { font-size: 1.5rem; margin-bottom: 0.75rem; }
+  .req-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem; }
+  .req-body  { font-size: 0.84rem; color: var(--steel); line-height: 1.6; font-weight: 300; }
+
+  /* Signup form */
+  .signup-section {
+    padding: 5rem 3rem;
+    background: linear-gradient(135deg, #0d2a15 0%, var(--navy) 100%);
+    border-top: 1px solid rgba(184,240,80,0.1);
+  }
+  .form-card {
+    max-width: 560px; margin: 0 auto;
+    background: var(--ink); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px; padding: 2.5rem;
+  }
+  .form-title { font-size: 1.6rem; margin-bottom: 0.5rem; text-align: center; }
+  .form-sub   { font-size: 0.88rem; color: var(--steel); text-align: center; margin-bottom: 2rem; }
+
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.78rem; letter-spacing: 0.08em; color: var(--steel); display: block; margin-bottom: 0.5rem; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+    padding: 0.75rem 1rem; color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem; outline: none; transition: border-color 0.2s;
+    appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--lime); }
+  .form-select option { background: var(--ink); }
+  .form-textarea { resize: vertical; min-height: 90px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .form-submit {
+    width: 100%; background: var(--lime); color: var(--navy);
+    padding: 1rem; border-radius: 10px; border: none; cursor: pointer;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+    transition: opacity 0.2s, transform 0.2s; margin-top: 0.5rem;
+  }
+  .form-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .form-note { font-size: 0.78rem; color: var(--steel); text-align: center; margin-top: 1rem; }
+
+  /* ══════════════════════════════
+     COMPANY PAGE
+  ══════════════════════════════ */
+  #company { background: var(--navy); }
+
+  #company .page-hero {
+    background: linear-gradient(160deg, #0D2545 0%, var(--navy) 60%);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  #company .page-hero::before {
+    background: radial-gradient(ellipse at 80% 50%, rgba(59,158,232,0.08) 0%, transparent 60%);
+  }
+
+  /* Review request flow */
+  .flow-section { padding: 5rem 3rem; }
+  .flow-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+
+  .flow-step {
+    background: var(--ink); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 16px; padding: 2rem; position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .flow-step:hover { border-color: rgba(59,158,232,0.3); transform: translateY(-4px); }
+  .flow-step-num {
+    width: 2.5rem; height: 2.5rem; border-radius: 50%;
+    background: rgba(59,158,232,0.12); border: 1px solid rgba(59,158,232,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem;
+    color: var(--sky); margin-bottom: 1rem;
+  }
+  .flow-step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.6rem; }
+  .flow-step-body  { font-size: 0.87rem; color: var(--steel); line-height: 1.6; font-weight: 300; }
+
+  /* Pricing */
+  .pricing-section { padding: 5rem 3rem; background: var(--ink); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+
+  .price-card {
+    background: var(--navy); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 2.25rem;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+  .price-card:hover { transform: translateY(-4px); }
+  .price-card.featured {
+    border-color: rgba(59,158,232,0.4);
+    background: linear-gradient(160deg, #0D2545 0%, var(--navy) 100%);
+    position: relative;
+  }
+  .price-popular {
+    position: absolute; top: -0.75rem; left: 50%; transform: translateX(-50%);
+    background: var(--sky); color: var(--navy);
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.7rem;
+    padding: 0.25rem 0.9rem; border-radius: 100px; letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .price-tier   { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.78rem; color: var(--steel); letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  .price-amount { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.8rem; line-height: 1; margin-bottom: 0.25rem; }
+  .price-amount sup { font-size: 1.4rem; vertical-align: super; }
+  .price-amount .price-unit { font-size: 1rem; font-weight: 400; color: var(--steel); }
+  .price-desc  { font-size: 0.85rem; color: var(--steel); margin-bottom: 1.5rem; line-height: 1.5; }
+
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .price-features li { font-size: 0.87rem; display: flex; gap: 0.6rem; align-items: flex-start; }
+  .price-features li::before { content: '✓'; color: var(--sky); font-weight: 700; font-family: 'Syne', sans-serif; flex-shrink: 0; margin-top: 0.05rem; }
+  .price-features li.na { opacity: 0.35; }
+  .price-features li.na::before { content: '×'; color: var(--steel); }
+
+  .btn-outline-blue {
+    display: block; text-align: center; width: 100%;
+    border: 1px solid rgba(59,158,232,0.4); color: var(--sky);
+    padding: 0.8rem; border-radius: 8px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; transition: background 0.2s, border-color 0.2s; background: transparent;
+    text-decoration: none;
+  }
+  .btn-outline-blue:hover { background: rgba(59,158,232,0.1); border-color: var(--sky); }
+
+  .btn-blue {
+    display: block; text-align: center; width: 100%;
+    background: var(--sky); color: var(--navy);
+    padding: 0.8rem; border-radius: 8px; border: none;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; transition: opacity 0.2s; text-decoration: none;
+  }
+  .btn-blue:hover { opacity: 0.85; }
+
+  /* Sample report teaser */
+  .report-preview { padding: 5rem 3rem; }
+  .report-frame {
+    background: var(--ink); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; overflow: hidden; margin-top: 3rem;
+  }
+  .report-frame-header {
+    background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.6rem;
+  }
+  .report-frame-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .report-frame-header .dot.r { background: #E85C3B; }
+  .report-frame-header .dot.y { background: #F0A030; }
+  .report-frame-header .dot.g { background: #4CAF50; }
+  .report-frame-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.82rem; color: var(--steel); margin-left: 0.5rem; }
+
+  .report-frame-body { padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .report-section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem; color: var(--steel); letter-spacing: 0.1em; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+  .report-metric { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .report-metric:last-child { border-bottom: none; }
+  .report-metric-label { font-size: 0.84rem; color: rgba(255,255,255,0.6); }
+  .report-metric-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.84rem; }
+  .report-metric-value.green { color: var(--lime); }
+  .report-metric-value.amber { color: var(--amber); }
+  .report-metric-value.red   { color: var(--danger); }
+  .report-metric-value.blue  { color: var(--sky); }
+
+  .report-bar-row { margin-bottom: 0.75rem; }
+  .report-bar-label { display: flex; justify-content: space-between; font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 0.3rem; }
+  .report-bar-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+  .report-bar-fill  { height: 100%; border-radius: 3px; }
+
+  /* Signup form for companies */
+  #company .signup-section {
+    background: linear-gradient(135deg, #0D2545 0%, var(--navy) 100%);
+    border-top: 1px solid rgba(59,158,232,0.1);
+  }
+  #company .form-input:focus,
+  #company .form-select:focus,
+  #company .form-textarea:focus { border-color: var(--sky); }
+  #company .form-submit { background: var(--sky); }
+  #company .form-submit:hover { opacity: 0.88; }
+
+  /* ── UTILITY ── */
+  .text-lime  { color: var(--lime); }
+  .text-sky   { color: var(--sky); }
+  .text-steel { color: var(--steel); }
+  .divider { height: 1px; background: rgba(255,255,255,0.06); }
+
+  /* ── ANIMATIONS ── */
+  .fade-in { animation: fadeIn 0.7s ease both; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in-2 { animation: fadeIn 0.7s 0.15s ease both; }
+  .fade-in-3 { animation: fadeIn 0.7s 0.3s ease both; }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 3rem; }
+    .steps-grid, .two-sides, .stats-strip, .timeline-grid,
+    .earnings-grid, .req-grid, .flow-steps, .pricing-grid { grid-template-columns: 1fr; }
+    .section, .timeline, .earnings-section, .requirements,
+    .signup-section, .flow-section, .pricing-section, .report-preview { padding: 3rem 1.5rem; }
+    .page-hero { padding: 7rem 1.5rem 3rem; }
+    .report-frame-body { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="#" class="nav-logo" onclick="showPage('landing')">
+    <span class="dd-mark">DD</span>
+    Double D
+  </a>
+  <div class="nav-links">
+    <a href="#" onclick="showPage('landing')">Home</a>
+    <a href="#" onclick="showPage('researcher')">For Researchers</a>
+    <a href="#" onclick="showPage('company')">For Firms</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="showPage('company')">Get Started</a>
+</nav>
+
+<!-- ════════════════════════════════════
+     LANDING PAGE
+════════════════════════════════════ -->
+<div id="landing" class="page active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-left fade-in">
+      <div class="hero-eyebrow">
+        <span class="dot"></span>
+        <span>Australia's Deep Tech Review Network</span>
+      </div>
+      <h1 class="display hero-title">
+        Does the<br><em>science</em><br>actually work?
+      </h1>
+      <p class="hero-body">
+        Double D connects Australian investment firms with university researchers who can tell them whether a deep tech company's technology has real scientific merit — before they write the cheque.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showPage('company')">I'm an Investment Firm</button>
+        <button class="btn-secondary" onclick="showPage('researcher')">I'm a Researcher</button>
+      </div>
+    </div>
+
+    <div class="hero-visual fade-in-2">
+      <div class="hero-card">
+        <div class="hero-card-header">
+          <span class="heading" style="font-size:0.95rem">Cleantech Review — SolarFlex Pty Ltd</span>
+          <span class="trl-badge">TRL 5</span>
+        </div>
+        <div class="score-grid">
+          <div class="score-item">
+            <div class="score-label">Scientific Validity</div>
+            <div class="score-bar"><div class="score-fill high" style="width:82%"></div></div>
+            <div class="score-val text-lime">4.1 / 5</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Scalability</div>
+            <div class="score-bar"><div class="score-fill medium" style="width:58%"></div></div>
+            <div class="score-val" style="color:var(--amber)">2.9 / 5</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">IP Strength</div>
+            <div class="score-bar"><div class="score-fill high" style="width:76%"></div></div>
+            <div class="score-val text-lime">3.8 / 5</div>
+          </div>
+          <div class="score-item">
+            <div class="score-label">Team Credibility</div>
+            <div class="score-bar"><div class="score-fill high" style="width:90%"></div></div>
+            <div class="score-val text-lime">4.5 / 5</div>
+          </div>
+        </div>
+        <div class="verdict-row">
+          <span class="verdict-label">OVERALL VERDICT</span>
+          <span class="verdict-value">Strong Technical Efficacy</span>
+        </div>
+      </div>
+
+      <div class="mini-cards">
+        <div class="mini-card">
+          <div class="mini-icon">🎓</div>
+          <div class="mini-title">UNSW Researcher</div>
+          <div class="mini-sub">School of Photovoltaics</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-icon">⚡</div>
+          <div class="mini-title">5 Day Turnaround</div>
+          <div class="mini-sub">Structured report</div>
+        </div>
+        <div class="mini-card">
+          <div class="mini-icon">🔒</div>
+          <div class="mini-title">NDA Protected</div>
+          <div class="mini-sub">Auto e-signature</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <div class="stats-strip fade-in">
+    <div>
+      <div class="stat-num">43</div>
+      <div class="stat-label">University researchers</div>
+    </div>
+    <div>
+      <div class="stat-num">12</div>
+      <div class="stat-label">Investment firms</div>
+    </div>
+    <div>
+      <div class="stat-num">8</div>
+      <div class="stat-label">Cleantech domains</div>
+    </div>
+    <div>
+      <div class="stat-num">5</div>
+      <div class="stat-label">Days avg. turnaround</div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <section class="section">
+    <div class="label section-label">How It Works</div>
+    <h2 class="heading section-title">From question to verdict in days, not months</h2>
+    <p class="section-sub">Investment firms post a technical review request. We match it to the right domain expert. They deliver a structured, legally-scoped technical efficacy report.</p>
+
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">Firm Posts Request</div>
+        <div class="step-body">Investment firm submits a review request: company name, technology description, domain, deadline, and budget.</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">🎯</div>
+        <div class="step-title">Expert Matched</div>
+        <div class="step-body">Double D matches the request to a credentialed university researcher with the right domain expertise. NDA auto-executed.</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">🔬</div>
+        <div class="step-title">Review Conducted</div>
+        <div class="step-body">Researcher assesses the technology against our structured template: TRL, scientific validity, scalability, IP, and risk.</div>
+        <div class="step-connector"></div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon">📊</div>
+        <div class="step-title">Report Delivered</div>
+        <div class="step-body">Firm receives a structured PDF report within 5 business days. Researcher is paid automatically on delivery.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Two sides -->
+  <section class="section" style="padding-top:0">
+    <div class="label section-label">Who It's For</div>
+    <h2 class="heading section-title">Two sides, one platform</h2>
+    <div class="two-sides">
+      <div class="side-card firm">
+        <div class="side-tag">INVESTMENT FIRMS</div>
+        <h3 class="heading side-title">Get independent technical signal</h3>
+        <p class="side-body">Stop relying on the founder's pitch deck. Get an honest, structured technical review from an active researcher who works in the exact domain you're evaluating.</p>
+        <ul class="side-perks">
+          <li>Cleantech-specific report template</li>
+          <li>TRL assessment with investment zone mapping</li>
+          <li>Scalability and IP risk analysis</li>
+          <li>NDA and IP protection built in</li>
+          <li>Structured questions to put to the founder</li>
+        </ul>
+        <button class="side-cta" onclick="showPage('company')">Learn more →</button>
+      </div>
+      <div class="side-card researcher">
+        <div class="side-tag">UNIVERSITY RESEARCHERS</div>
+        <h3 class="heading side-title">Get paid for what you already know</h3>
+        <p class="side-body">Turn your deep domain expertise into consulting income. Review technologies in your field, on your schedule, with no conflict-of-interest issues.</p>
+        <ul class="side-perks">
+          <li>$1,200–$2,400 AUD per review</li>
+          <li>Structured template — no blank-page anxiety</li>
+          <li>Average 5–8 hours of work per review</li>
+          <li>Automatic payment on report acceptance</li>
+          <li>Full independence — no investment opinion required</li>
+        </ul>
+        <button class="side-cta" onclick="showPage('researcher')">Learn more →</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Double D Pty Ltd · Australia · ABN XX XXX XXX XXX</p>
+    <p class="text-steel" style="font-size:0.78rem">Technical efficacy reviews only. Not financial product advice under the Corporations Act 2001 (Cth).</p>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════
+     RESEARCHER PAGE
+════════════════════════════════════ -->
+<div id="researcher" class="page">
+
+  <section class="page-hero">
+    <div class="page-hero-inner fade-in">
+      <div class="page-tag">
+        <span class="dot"></span>
+        <span>For University Researchers</span>
+      </div>
+      <h1 class="display page-title">Your expertise<br>has a <em class="text-lime">market value</em></h1>
+      <p class="page-body">You've spent years mastering a deep tech domain. Investment firms need exactly that knowledge — and they'll pay well for an honest, structured technical opinion. No financial advice. Just science.</p>
+      <button class="btn-primary" onclick="document.getElementById('researcher-form').scrollIntoView({behavior:'smooth'})">Apply to Join the Network</button>
+    </div>
+  </section>
+
+  <!-- How the process works -->
+  <section class="timeline">
+    <div class="label section-label">The Process</div>
+    <h2 class="heading section-title">Simple, structured, well-paid</h2>
+    <div class="timeline-grid">
+      <div class="timeline-item">
+        <div class="tl-step">STEP 01 — APPLY</div>
+        <div class="tl-title">Create your profile</div>
+        <div class="tl-body">Submit your credentials, research focus, and domain expertise. We verify your affiliation and add you to the network within 48 hours.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-step">STEP 02 — MATCH</div>
+        <div class="tl-title">Get matched to a review</div>
+        <div class="tl-body">When a firm posts a request in your domain, you'll receive a notification. You can accept or decline with no obligation. NDAs are pre-generated and auto-signed.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-step">STEP 03 — REVIEW</div>
+        <div class="tl-title">Use our structured template</div>
+        <div class="tl-body">No blank page. Our 13-section Cleantech Technical Efficacy Report template guides your assessment — TRL, scientific validity, scalability, IP, team credibility, and risk.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-step">STEP 04 — GET PAID</div>
+        <div class="tl-title">Automatic payment</div>
+        <div class="tl-body">Submit your completed report. Once accepted by the firm (typically within 24 hours), payment hits your account automatically. No invoicing, no chasing.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Earnings -->
+  <section class="earnings-section">
+    <div class="label section-label" style="color:var(--lime)">Earnings</div>
+    <h2 class="heading section-title">What you can earn</h2>
+    <div class="earnings-grid">
+      <div class="earn-card">
+        <div class="earn-amount">$1,200</div>
+        <div class="earn-type">Standard Review · AUD</div>
+        <div class="earn-desc">Single-technology efficacy assessment. Covers scientific validity, TRL, and key technical risks. Estimated 5–6 hours of work.</div>
+        <span class="earn-tag">Most common</span>
+      </div>
+      <div class="earn-card featured">
+        <div class="earn-amount">$1,800</div>
+        <div class="earn-type">Deep Review · AUD</div>
+        <div class="earn-desc">Full 13-section report including scalability assessment, IP analysis, competitive landscape, and a recommended questions register. 7–9 hours.</div>
+        <span class="earn-tag">Recommended</span>
+      </div>
+      <div class="earn-card">
+        <div class="earn-amount">$2,400</div>
+        <div class="earn-type">Expert Review · AUD</div>
+        <div class="earn-desc">Complex or multi-technology reviews. For firms requiring additional follow-up Q&A session with the reviewer post-submission. 10–12 hours.</div>
+        <span class="earn-tag">High complexity</span>
+      </div>
+    </div>
+    <p style="font-size:0.82rem; color:var(--steel); margin-top:1.5rem;">Researchers keep 80% of the fee. Double D retains a 20% platform fee covering matching, NDA management, and payment processing.</p>
+  </section>
+
+  <!-- Requirements -->
+  <section class="requirements">
+    <div class="label section-label">Eligibility</div>
+    <h2 class="heading section-title">Who we're looking for</h2>
+    <div class="req-grid">
+      <div class="req-item">
+        <div class="req-icon">🎓</div>
+        <div class="req-title">Academic Affiliation</div>
+        <div class="req-body">Current appointment at an Australian university or public research institution (CSIRO, ANSTO, etc.).</div>
+      </div>
+      <div class="req-item">
+        <div class="req-icon">🔬</div>
+        <div class="req-title">Domain Expertise</div>
+        <div class="req-body">PhD-level knowledge in a relevant cleantech domain: energy storage, solar, hydrogen, carbon capture, advanced materials, grid tech.</div>
+      </div>
+      <div class="req-item">
+        <div class="req-icon">📄</div>
+        <div class="req-title">Publication Record</div>
+        <div class="req-body">Demonstrated research output in your domain. Peer-reviewed publications, patents, or equivalent research output required.</div>
+      </div>
+      <div class="req-item">
+        <div class="req-icon">⚖️</div>
+        <div class="req-title">No Conflicts</div>
+        <div class="req-body">No financial interest in the companies you review. You must be able to declare independence before accepting each review.</div>
+      </div>
+      <div class="req-item">
+        <div class="req-icon">📋</div>
+        <div class="req-title">Structured Reporting</div>
+        <div class="req-body">Ability to complete our structured 13-section report template. Technical findings only — no investment opinion or financial advice.</div>
+      </div>
+      <div class="req-item">
+        <div class="req-icon">🕐</div>
+        <div class="req-title">Availability</div>
+        <div class="req-body">Capacity to complete a review within 5 business days of acceptance. You choose which requests to take on — no commitment to volume.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Signup form -->
+  <section class="signup-section" id="researcher-form">
+    <div class="form-card fade-in">
+      <h3 class="heading form-title">Join the Researcher Network</h3>
+      <p class="form-sub">We'll review your application and be in touch within 48 hours.</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" placeholder="Jane">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" placeholder="Smith">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">University / Institution Email</label>
+        <input type="email" class="form-input" placeholder="j.smith@unsw.edu.au">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Institution</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select...</option>
+            <option>University of Melbourne</option>
+            <option>UNSW Sydney</option>
+            <option>University of Sydney</option>
+            <option>ANU</option>
+            <option>University of Queensland</option>
+            <option>Monash University</option>
+            <option>University of Western Australia</option>
+            <option>CSIRO</option>
+            <option>ANSTO</option>
+            <option>Other Australian institution</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Academic Level</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select...</option>
+            <option>PhD Candidate</option>
+            <option>Postdoctoral Researcher</option>
+            <option>Research Fellow</option>
+            <option>Lecturer / Senior Lecturer</option>
+            <option>Associate Professor</option>
+            <option>Professor</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Primary Domain Expertise</label>
+        <select class="form-select">
+          <option value="" disabled selected>Select your domain...</option>
+          <option>Solar / Photovoltaics</option>
+          <option>Battery Storage / Electrochemistry</option>
+          <option>Green Hydrogen / Electrolysis</option>
+          <option>Carbon Capture & Storage</option>
+          <option>Wind / Tidal Energy</option>
+          <option>Grid Technology / Smart Energy</option>
+          <option>Advanced Materials (Cleantech)</option>
+          <option>Thermal Energy Storage</option>
+          <option>Other Cleantech Domain</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Brief Research Bio</label>
+        <textarea class="form-textarea" placeholder="Briefly describe your research focus and key publications (2–3 sentences)..."></textarea>
+      </div>
+      <button class="form-submit">Submit Application</button>
+      <p class="form-note">By submitting you agree to our Researcher Terms. Your details will not be shared without your consent.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Double D Pty Ltd · Australia</p>
+    <p class="text-steel" style="font-size:0.78rem">Technical efficacy reviews only. Not financial product advice.</p>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════
+     COMPANY / FIRM PAGE
+════════════════════════════════════ -->
+<div id="company" class="page">
+
+  <section class="page-hero">
+    <div class="page-hero-inner fade-in">
+      <div class="page-tag blue">
+        <span>For Investment Firms</span>
+      </div>
+      <h1 class="display page-title">Stop trusting<br>the <em class="text-sky">pitch deck</em></h1>
+      <p class="page-body">Before you commit capital to a deep tech cleantech company, get an independent technical opinion from a researcher who actually works in that domain. Not a consultant. A scientist.</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn-primary" style="background:var(--sky)" onclick="document.getElementById('firm-form').scrollIntoView({behavior:'smooth'})">Request a Review</button>
+        <button class="btn-secondary" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See Pricing</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works for firms -->
+  <section class="flow-section">
+    <div class="label section-label" style="color:var(--sky)">Process</div>
+    <h2 class="heading section-title">From request to report in 5 days</h2>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div class="flow-step-title">Submit a Review Request</div>
+        <div class="flow-step-body">Tell us the company name, technology description, domain, key claims you want validated, and your deadline. Takes 10 minutes.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div class="flow-step-title">We Match & Execute NDAs</div>
+        <div class="flow-step-body">Within 24 hours, Double D matches your request to the right researcher. NDAs are auto-generated and e-signed by both parties before any information is shared.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div class="flow-step-title">Receive Your Report</div>
+        <div class="flow-step-body">Get a structured 13-section Technical Efficacy Report: TRL assessment, scorecard, risk register, IP overview, team credibility, and a list of technical questions for the founder.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Report preview -->
+  <section class="report-preview">
+    <div class="label section-label" style="color:var(--sky)">Sample Output</div>
+    <h2 class="heading section-title">What's in the report</h2>
+    <div class="report-frame">
+      <div class="report-frame-header">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <span class="report-frame-title">Cleantech Technical Efficacy Report — Double D · REF-2025-001 · CONFIDENTIAL</span>
+      </div>
+      <div class="report-frame-body">
+        <div>
+          <div class="report-section-title">EXECUTIVE SUMMARY</div>
+          <div class="report-metric"><span class="report-metric-label">Company</span><span class="report-metric-value blue">SolarFlex Pty Ltd</span></div>
+          <div class="report-metric"><span class="report-metric-label">Technology</span><span class="report-metric-value">Perovskite tandem cell</span></div>
+          <div class="report-metric"><span class="report-metric-label">TRL Assessment</span><span class="report-metric-value blue">TRL 5 — Seed / Angel</span></div>
+          <div class="report-metric"><span class="report-metric-label">Typical Instrument</span><span class="report-metric-value blue">Priced Equity — Seed Round</span></div>
+          <div class="report-metric"><span class="report-metric-label">Overall Verdict</span><span class="report-metric-value green">Strong Technical Efficacy</span></div>
+          <div class="report-metric"><span class="report-metric-label">Primary Risk</span><span class="report-metric-value amber">Long-term stability unproven</span></div>
+          <div class="report-metric"><span class="report-metric-label">Reviewer</span><span class="report-metric-value">Dr. A. Nguyen · UNSW</span></div>
+        </div>
+        <div>
+          <div class="report-section-title">TECHNICAL EFFICACY SCORECARD</div>
+          <div class="report-bar-row">
+            <div class="report-bar-label"><span>Scientific Validity</span><span class="text-lime">4.1 / 5</span></div>
+            <div class="report-bar-track"><div class="report-bar-fill" style="width:82%;background:var(--lime)"></div></div>
+          </div>
+          <div class="report-bar-row">
+            <div class="report-bar-label"><span>Reproducibility</span><span class="text-lime">3.8 / 5</span></div>
+            <div class="report-bar-track"><div class="report-bar-fill" style="width:76%;background:var(--lime)"></div></div>
+          </div>
+          <div class="report-bar-row">
+            <div class="report-bar-label"><span>Scalability (lab→pilot)</span><span style="color:var(--amber)">2.9 / 5</span></div>
+            <div class="report-bar-track"><div class="report-bar-fill" style="width:58%;background:var(--amber)"></div></div>
+          </div>
+          <div class="report-bar-row">
+            <div class="report-bar-label"><span>IP Strength</span><span class="text-lime">3.8 / 5</span></div>
+            <div class="report-bar-track"><div class="report-bar-fill" style="width:76%;background:var(--lime)"></div></div>
+          </div>
+          <div class="report-bar-row">
+            <div class="report-bar-label"><span>Team Credibility</span><span class="text-lime">4.5 / 5</span></div>
+            <div class="report-bar-track"><div class="report-bar-fill" style="width:90%;background:var(--lime)"></div></div>
+          </div>
+          <div class="report-bar-row">
+            <div class="report-bar-label"><span>Overall Efficacy</span><span class="text-lime">3.8 / 5</span></div>
+            <div class="report-bar-track"><div class="report-bar-fill" style="width:76%;background:var(--sky)"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing-section" id="pricing">
+    <div class="label section-label" style="color:var(--sky)">Pricing</div>
+    <h2 class="heading section-title">Transparent, flat-fee pricing</h2>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-tier">STANDARD</div>
+        <div class="price-amount"><sup>$</sup>1,500<span class="price-unit"> AUD</span></div>
+        <div class="price-desc">Quick technical sanity check. Ideal for early screening before deeper diligence.</div>
+        <ul class="price-features">
+          <li>Scientific validity assessment</li>
+          <li>TRL classification</li>
+          <li>Top 3 technical risks</li>
+          <li>5 business day turnaround</li>
+          <li class="na">Full 13-section report</li>
+          <li class="na">IP landscape review</li>
+          <li class="na">Reviewer Q&A session</li>
+        </ul>
+        <button class="btn-outline-blue" onclick="document.getElementById('firm-form').scrollIntoView({behavior:'smooth'})">Get Started</button>
+      </div>
+
+      <div class="price-card featured">
+        <div class="price-popular">MOST POPULAR</div>
+        <div class="price-tier">DEEP REVIEW</div>
+        <div class="price-amount"><sup>$</sup>2,200<span class="price-unit"> AUD</span></div>
+        <div class="price-desc">Full structured review. The complete picture before a term sheet.</div>
+        <ul class="price-features">
+          <li>Scientific validity assessment</li>
+          <li>TRL classification + justification</li>
+          <li>Full risk register</li>
+          <li>5 business day turnaround</li>
+          <li>Full 13-section report</li>
+          <li>IP landscape review</li>
+          <li class="na">Reviewer Q&A session</li>
+        </ul>
+        <a href="#" class="btn-blue" onclick="document.getElementById('firm-form').scrollIntoView({behavior:'smooth'});return false">Get Started</a>
+      </div>
+
+      <div class="price-card">
+        <div class="price-tier">EXPERT</div>
+        <div class="price-amount"><sup>$</sup>3,200<span class="price-unit"> AUD</span></div>
+        <div class="price-desc">Deep review plus a 60-minute video Q&A with the reviewer post-report.</div>
+        <ul class="price-features">
+          <li>Scientific validity assessment</li>
+          <li>TRL classification + justification</li>
+          <li>Full risk register</li>
+          <li>5 business day turnaround</li>
+          <li>Full 13-section report</li>
+          <li>IP landscape review</li>
+          <li>60-min reviewer Q&A session</li>
+        </ul>
+        <button class="btn-outline-blue" onclick="document.getElementById('firm-form').scrollIntoView({behavior:'smooth'})">Get Started</button>
+      </div>
+    </div>
+    <p style="font-size:0.82rem; color:var(--steel); margin-top:1.5rem; text-align:center;">All prices include GST. Secure payment via Stripe. Researcher paid automatically on report acceptance.</p>
+  </section>
+
+  <!-- Signup form for firms -->
+  <section class="signup-section" id="firm-form">
+    <div class="form-card fade-in">
+      <h3 class="heading form-title">Request a Technical Review</h3>
+      <p class="form-sub">Tell us about the company. We'll match you with the right researcher within 24 hours.</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="Alex Johnson">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Firm</label>
+          <input type="text" class="form-input" placeholder="Horizon Ventures">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Work Email</label>
+        <input type="email" class="form-input" placeholder="alex@horizonventures.com.au">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Company to be Reviewed</label>
+        <input type="text" class="form-input" placeholder="Name of the deep tech company">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Technology Domain</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select domain...</option>
+            <option>Solar / Photovoltaics</option>
+            <option>Battery Storage</option>
+            <option>Green Hydrogen</option>
+            <option>Carbon Capture</option>
+            <option>Wind / Tidal Energy</option>
+            <option>Grid Technology</option>
+            <option>Advanced Materials</option>
+            <option>Other Cleantech</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Review Type</label>
+          <select class="form-select">
+            <option value="" disabled selected>Select...</option>
+            <option>Standard — $1,500</option>
+            <option>Deep Review — $2,200</option>
+            <option>Expert (incl. Q&A) — $3,200</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">What do you need validated?</label>
+        <textarea class="form-textarea" placeholder="Describe the specific technical claims or concerns you want the researcher to address. The more specific, the better the review."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Deadline</label>
+        <input type="date" class="form-input">
+      </div>
+      <button class="form-submit" style="background:var(--sky)">Submit Review Request</button>
+      <p class="form-note">We'll send a confirmation and invoice within 2 business hours. No payment until a researcher is confirmed.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Double D Pty Ltd · Australia</p>
+    <p class="text-steel" style="font-size:0.78rem">Technical efficacy reviews only. Not financial product advice under the Corporations Act 2001 (Cth).</p>
+  </footer>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
