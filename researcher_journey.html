@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Diligence — Researcher Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --ivory:#F7F4EE; --paper:#EFEBD8; --parchment:#E6E0D4; --obsidian:#161412;
+  --charcoal:#2A2520; --ash:#5C5650; --mist:#9A958E; --rule:#D5CFC6; --faint:#ECE8E1;
+  --copper:#8C5E38; --copper-lt:#B07D50; --copper-dim:#F0E8DE;
+  --confirm:#2D5A3D; --confirm-bg:#EAF2EC; --warn:#6B4A12; --warn-bg:#F5EDDC;
+  --error:#7A1F1F; --error-bg:#F5EAEA; --res-ink:#1A3A28; --res-bg:#EAF2EE; --res-mid:#2D5A3D;
+  --firm-ink:#1A2E44; --firm-bg:#EDF1F7;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { font-size:16px; scroll-behavior:smooth; }
+body { font-family:'IBM Plex Sans',sans-serif; background:var(--ivory); color:var(--obsidian); -webkit-font-smoothing:antialiased; min-height:100vh; }
+
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:200; background:rgba(247,244,238,0.96); backdrop-filter:blur(8px); border-bottom:1px solid var(--rule); }
+.nav-inner { max-width:1160px; margin:0 auto; padding:0 3rem; height:60px; display:flex; align-items:center; justify-content:space-between; }
+.nav-logo { font-family:'Playfair Display',serif; font-weight:500; font-size:1.1rem; color:var(--obsidian); text-decoration:none; display:flex; align-items:center; gap:0.75rem; }
+.nav-logotype { width:28px; height:28px; border:1px solid var(--copper); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--copper); letter-spacing:0.04em; }
+.nav-tabs { display:flex; gap:0.5rem; }
+.nav-tab { font-size:0.68rem; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--mist); background:none; border:1px solid transparent; padding:0.4rem 0.85rem; cursor:pointer; transition:all 0.15s; }
+.nav-tab:hover { color:var(--charcoal); }
+.nav-tab.active { color:var(--res-ink); border-color:var(--rule); background:var(--res-bg); }
+
+/* PROGRESS */
+.progress-bar { position:fixed; top:60px; left:0; right:0; z-index:199; background:var(--res-bg); border-bottom:1px solid rgba(42,80,56,0.15); display:none; }
+.progress-bar.show { display:block; }
+.progress-inner { max-width:1160px; margin:0 auto; padding:0 3rem; display:flex; align-items:stretch; }
+.prog-step { display:flex; align-items:center; gap:0.6rem; padding:0.85rem 0; flex:1; position:relative; cursor:pointer; }
+.prog-step + .prog-step { padding-left:1rem; }
+.prog-num { width:22px; height:22px; flex-shrink:0; border:1px solid rgba(42,80,56,0.25); display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; font-weight:500; color:var(--mist); background:var(--res-bg); transition:all 0.2s; }
+.prog-label { font-size:0.65rem; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--mist); white-space:nowrap; }
+.prog-step.active .prog-num { background:var(--res-ink); border-color:var(--res-ink); color:var(--ivory); }
+.prog-step.active .prog-label { color:var(--res-ink); }
+.prog-step.done .prog-num { background:var(--confirm); border-color:var(--confirm); color:var(--ivory); }
+.prog-step.done .prog-label { color:var(--confirm); }
+.prog-track { position:absolute; bottom:0; left:0; right:0; height:2px; background:transparent; }
+.prog-step.active .prog-track { background:var(--res-ink); }
+.prog-step.done .prog-track { background:var(--confirm); }
+
+/* LAYOUT */
+.page-wrap { max-width:780px; margin:0 auto; padding:150px 3rem 6rem; }
+.page-wrap.has-progress { padding-top:150px; }
+.page-wrap.no-progress { padding-top:110px; }
+.flow { display:none; }
+.flow.active { display:block; }
+.screen { display:none; animation:riseIn 0.4s ease both; }
+.screen.active { display:block; }
+@keyframes riseIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.screen-eyebrow { font-size:0.65rem; font-weight:600; letter-spacing:0.2em; text-transform:uppercase; color:var(--res-ink); margin-bottom:0.75rem; }
+.screen-title { font-family:'Playfair Display',serif; font-weight:400; font-size:clamp(1.8rem,3vw,2.5rem); line-height:1.1; margin-bottom:0.75rem; }
+.screen-title em { font-style:italic; color:var(--copper); }
+.screen-sub { font-size:0.9rem; color:var(--ash); line-height:1.75; font-weight:300; max-width:560px; margin-bottom:2.5rem; }
+
+/* FORM BLOCKS */
+.form-block { border:1px solid var(--rule); border-top:2px solid var(--res-ink); margin-bottom:1.5rem; background:var(--ivory); }
+.form-block-hd { padding:1.1rem 1.75rem; border-bottom:1px solid var(--rule); display:flex; align-items:center; gap:1rem; background:var(--faint); }
+.form-block-num { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--copper); letter-spacing:0.1em; }
+.form-block-title { font-size:0.82rem; font-weight:600; color:var(--obsidian); }
+.form-block-sub { font-size:0.75rem; color:var(--ash); font-weight:300; margin-left:auto; }
+.form-block-body { padding:1.75rem; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.form-group { margin-bottom:1.2rem; }
+.form-group:last-child { margin-bottom:0; }
+.form-label { display:block; font-size:0.65rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--charcoal); margin-bottom:0.45rem; }
+.form-label .req { color:var(--copper); margin-left:0.2rem; }
+.form-input,.form-select,.form-textarea { width:100%; background:var(--ivory); border:1px solid var(--rule); padding:0.75rem 0.9rem; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:300; color:var(--obsidian); outline:none; transition:border-color 0.15s; appearance:none; border-radius:0; }
+.form-input:focus,.form-select:focus,.form-textarea:focus { border-color:var(--res-ink); }
+.form-input::placeholder,.form-textarea::placeholder { color:var(--mist); }
+.form-textarea { resize:vertical; min-height:88px; line-height:1.6; }
+.form-hint { font-size:0.72rem; color:var(--mist); margin-top:0.4rem; font-weight:300; line-height:1.5; }
+
+/* BUTTONS */
+.btn-row { display:flex; gap:1rem; align-items:center; margin-top:2rem; flex-wrap:wrap; }
+.btn-primary { font-family:'IBM Plex Sans',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; background:var(--res-ink); color:var(--ivory); border:none; padding:0.9rem 2rem; cursor:pointer; transition:background 0.15s; }
+.btn-primary:hover { background:var(--res-mid); }
+.btn-outline { font-family:'IBM Plex Sans',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; background:transparent; color:var(--res-ink); border:1px solid var(--res-ink); padding:0.9rem 2rem; cursor:pointer; transition:all 0.15s; }
+.btn-outline:hover { background:var(--res-ink); color:var(--ivory); }
+.btn-ghost { font-size:0.72rem; font-weight:500; color:var(--mist); background:none; border:none; cursor:pointer; padding:0.9rem 0; text-decoration:underline; text-underline-offset:3px; }
+
+/* CONSENT / CHECK */
+.consent-item { display:grid; grid-template-columns:auto 1fr; gap:1rem; align-items:start; padding:1rem 0; cursor:pointer; }
+.consent-checkbox { width:20px; height:20px; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:0.1rem; transition:all 0.15s; background:var(--ivory); }
+.consent-checkbox.checked { background:var(--res-ink); border-color:var(--res-ink); }
+.consent-checkbox svg { width:10px; height:10px; color:transparent; }
+.consent-checkbox.checked svg { color:var(--ivory); }
+.consent-text { font-size:0.82rem; color:var(--charcoal); line-height:1.6; font-weight:300; }
+
+/* INFO PANELS */
+.info-panel { border:1px solid var(--rule); border-left:3px solid var(--copper); padding:1.25rem 1.5rem; background:var(--copper-dim); margin-bottom:1.5rem; }
+.info-panel.green { border-left-color:var(--res-ink); background:var(--res-bg); }
+.info-panel.blue { border-left-color:var(--firm-ink); background:var(--firm-bg); }
+.info-panel-title { font-size:0.72rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--copper); margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+.info-panel.green .info-panel-title { color:var(--res-ink); }
+.info-panel.blue .info-panel-title { color:var(--firm-ink); }
+.info-panel-title svg { width:13px; height:13px; }
+.info-panel-body { font-size:0.8rem; color:var(--charcoal); line-height:1.65; font-weight:300; }
+.info-panel-body strong { font-weight:600; color:var(--obsidian); }
+
+/* CONFIRMATION */
+.confirm-screen { text-align:center; max-width:600px; margin:0 auto; }
+.confirm-icon { width:64px; height:64px; border:1px solid var(--confirm); background:var(--confirm-bg); display:flex; align-items:center; justify-content:center; margin:0 auto 2rem; }
+.confirm-icon svg { width:28px; height:28px; color:var(--confirm); }
+.confirm-ref { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--copper); letter-spacing:0.12em; margin-bottom:1rem; }
+.confirm-steps { border:1px solid var(--rule); border-top:2px solid var(--res-ink); margin-top:2.5rem; text-align:left; }
+.confirm-step { display:grid; grid-template-columns:auto 1fr; gap:1.25rem; padding:1.25rem 1.5rem; border-bottom:1px solid var(--rule); align-items:start; }
+.confirm-step:last-child { border-bottom:none; }
+.confirm-step-n { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--copper); padding-top:0.1rem; letter-spacing:0.06em; }
+.confirm-step-title { font-size:0.85rem; font-weight:600; color:var(--obsidian); margin-bottom:0.3rem; }
+.confirm-step-body { font-size:0.78rem; color:var(--ash); line-height:1.6; font-weight:300; }
+
+/* WELCOME / ONBOARDING */
+.welcome-hero { text-align:center; padding:2rem 0 3rem; }
+.welcome-badge { display:inline-flex; align-items:center; gap:0.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--confirm); border:1px solid var(--confirm); background:var(--confirm-bg); padding:0.3rem 0.85rem; margin-bottom:1.5rem; }
+.welcome-badge svg { width:11px; height:11px; }
+.onboard-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.5rem; }
+.onboard-card { border:1px solid var(--rule); border-top:2px solid var(--copper); padding:1.5rem; background:var(--ivory); transition:border-color 0.2s; }
+.onboard-card:hover { border-color:var(--charcoal); border-top-color:var(--copper); }
+.onboard-card-icon { width:40px; height:40px; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; color:var(--copper); margin-bottom:1rem; }
+.onboard-card-icon svg { width:20px; height:20px; }
+.onboard-card-title { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:500; margin-bottom:0.5rem; }
+.onboard-card-body { font-size:0.8rem; color:var(--ash); line-height:1.6; font-weight:300; margin-bottom:1rem; }
+.onboard-card-link { font-size:0.68rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--copper); display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer; }
+.checklist { border:1px solid var(--rule); border-top:2px solid var(--res-ink); }
+.checklist-hd { padding:1.1rem 1.5rem; background:var(--faint); border-bottom:1px solid var(--rule); font-size:0.72rem; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--charcoal); }
+.checklist-item { display:grid; grid-template-columns:auto 1fr auto; gap:1rem; padding:1rem 1.5rem; border-bottom:1px solid var(--faint); align-items:center; }
+.checklist-item:last-child { border-bottom:none; }
+.checklist-check { width:22px; height:22px; border-radius:50%; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.checklist-check.done { background:var(--confirm); border-color:var(--confirm); }
+.checklist-check.done svg { color:var(--ivory); }
+.checklist-check svg { width:11px; height:11px; color:transparent; }
+.checklist-label { font-size:0.85rem; color:var(--charcoal); }
+.checklist-label.done { color:var(--mist); text-decoration:line-through; }
+.checklist-action { font-size:0.65rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--copper); cursor:pointer; white-space:nowrap; }
+.checklist-status { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--confirm); letter-spacing:0.08em; }
+
+/* SCHEDULING */
+.sched-summary { border:1px solid var(--rule); border-top:2px solid var(--firm-ink); margin-bottom:1.5rem; }
+.sched-summary-hd { background:var(--obsidian); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
+.sched-summary-label { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:rgba(247,244,238,0.5); letter-spacing:0.1em; text-transform:uppercase; }
+.sched-summary-ref { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; color:rgba(247,244,238,0.3); }
+.sched-summary-body { padding:1.25rem 1.5rem; }
+.sched-row { display:flex; justify-content:space-between; align-items:baseline; padding:0.5rem 0; border-bottom:1px solid var(--faint); }
+.sched-row:last-child { border-bottom:none; }
+.sched-row-key { font-size:0.78rem; color:var(--ash); font-weight:300; }
+.sched-row-val { font-size:0.78rem; font-weight:500; color:var(--charcoal); }
+
+.slot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; }
+.time-slot { border:1px solid var(--rule); padding:0.85rem; text-align:center; cursor:pointer; transition:all 0.15s; background:var(--ivory); }
+.time-slot:hover { border-color:var(--res-ink); background:var(--res-bg); }
+.time-slot.selected { border-color:var(--res-ink); border-width:2px; background:var(--res-bg); }
+.time-slot-day { font-size:0.62rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--mist); margin-bottom:0.3rem; }
+.time-slot.selected .time-slot-day { color:var(--res-ink); }
+.time-slot-date { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--obsidian); margin-bottom:0.2rem; }
+.time-slot-time { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--charcoal); }
+.proposed-slots { display:flex; flex-direction:column; gap:0.6rem; }
+.proposed-slot { display:grid; grid-template-columns:auto 1fr auto; gap:1rem; align-items:center; border:1px solid var(--rule); padding:0.85rem 1.25rem; }
+.proposed-slot-num { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--copper); }
+.proposed-slot-text { font-size:0.85rem; color:var(--charcoal); }
+.proposed-slot-remove { width:28px; height:28px; border:1px solid var(--rule); background:var(--ivory); cursor:pointer; color:var(--mist); display:flex; align-items:center; justify-content:center; }
+.proposed-slot-remove:hover { border-color:var(--obsidian); color:var(--obsidian); }
+.proposed-slot-remove svg { width:11px; height:11px; }
+
+/* HOME CARDS (flow picker) */
+.home-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:2rem; }
+.home-card { border:1px solid var(--rule); border-top:2px solid var(--res-ink); padding:2rem; cursor:pointer; background:var(--ivory); transition:all 0.2s; }
+.home-card:hover { border-color:var(--charcoal); background:var(--faint); }
+.home-card-tag { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--copper); margin-bottom:1rem; display:block; }
+.home-card-icon { width:40px; height:40px; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; color:var(--res-ink); margin-bottom:1rem; }
+.home-card-icon svg { width:20px; height:20px; }
+.home-card-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:500; margin-bottom:0.5rem; }
+.home-card-body { font-size:0.82rem; color:var(--ash); line-height:1.6; font-weight:300; }
+
+@media (max-width:760px) {
+  .nav-inner,.progress-inner { padding:0 1.5rem; }
+  .prog-label { display:none; }
+  .page-wrap { padding:140px 1.5rem 4rem; }
+  .form-row,.onboard-grid,.home-grid { grid-template-columns:1fr; }
+  .slot-grid { grid-template-columns:1fr 1fr; }
+  .nav-tabs { display:none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" onclick="showFlow('home');return false;">
+      <span class="nav-logotype">DD</span>
+      Deep Diligence
+    </a>
+    <div class="nav-tabs">
+      <button class="nav-tab" onclick="showFlow('eoi')">1 · Express Interest</button>
+      <button class="nav-tab" onclick="showFlow('welcome')">2 · Welcome</button>
+      <button class="nav-tab" onclick="showFlow('schedule')">3 · Schedule Call</button>
+    </div>
+  </div>
+</nav>
+
+<!-- PROGRESS (EOI only) -->
+<div class="progress-bar" id="eoi-progress">
+  <div class="progress-inner">
+    <div class="prog-step active" id="eprog-1"><span class="prog-num">01</span><span class="prog-label">Your Interest</span><div class="prog-track"></div></div>
+    <div class="prog-step" id="eprog-2"><span class="prog-num">02</span><span class="prog-label">Submitted</span><div class="prog-track"></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOME — flow picker
+═══════════════════════════════════════════════════════════ -->
+<div class="flow active" id="flow-home">
+  <div class="page-wrap no-progress">
+    <div class="screen-eyebrow">Researcher Journey</div>
+    <h1 class="screen-title">The researcher<br><em>journey</em></h1>
+    <p class="screen-sub">These are the remaining touchpoints in the researcher experience, built out from the end-to-end process map. Use the tabs above or the cards below to preview each one.</p>
+
+    <div class="home-grid">
+      <div class="home-card" onclick="showFlow('eoi')">
+        <span class="home-card-tag">Process Step 2</span>
+        <div class="home-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4h14M3 9h14M3 14h9"/></svg></div>
+        <div class="home-card-title">Expression of Interest</div>
+        <div class="home-card-body">The lightweight pre-registration form. Captures interest before the full profile build. Admin reviews for basic eligibility, then invites qualified researchers to complete their full profile.</div>
+      </div>
+      <div class="home-card" onclick="showFlow('welcome')">
+        <span class="home-card-tag">Process Step 4</span>
+        <div class="home-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 2l2.4 5 5.6.5-4 3.7 1.1 5.3L10 18.5 4.9 16.5 6 11.2 2 7.5 7.6 7z"/></svg></div>
+        <div class="home-card-title">Welcome &amp; Onboarding</div>
+        <div class="home-card-body">The page a researcher lands on after approval. Activation checklist, onboarding materials, and the things they need to do before their first review request arrives.</div>
+      </div>
+      <div class="home-card" onclick="showFlow('schedule')">
+        <span class="home-card-tag">Process Step 6–7</span>
+        <div class="home-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="4" width="14" height="13" rx="1"/><path d="M3 8h14M7 2v4M13 2v4"/></svg></div>
+        <div class="home-card-title">Consultation Scheduling</div>
+        <div class="home-card-body">After accepting, the researcher proposes call times and provides their meeting link. The investor confirms a slot. The flow that closes the loop between acceptance and the call.</div>
+      </div>
+      <div class="home-card" style="border-top-color:var(--mist);opacity:0.85;" onclick="showResolved()">
+        <span class="home-card-tag" style="color:var(--mist);">Decisions Made</span>
+        <div class="home-card-icon" style="color:var(--mist);"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="8"/><path d="M7 10l2 2 4-4"/></svg></div>
+        <div class="home-card-title">Resolved Open Questions</div>
+        <div class="home-card-body">The five yellow-highlighted items from the process doc, with the call made on each. Click to review.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FLOW 1 — EXPRESSION OF INTEREST
+═══════════════════════════════════════════════════════════ -->
+<div class="flow" id="flow-eoi">
+
+  <!-- Screen 1 -->
+  <div class="page-wrap has-progress screen active" id="eoi-1">
+    <div class="screen-eyebrow">Step 1 — Expression of Interest</div>
+    <h1 class="screen-title">Register your<br><em>interest</em></h1>
+    <p class="screen-sub">This is a quick first step — just enough for us to confirm you're a fit. If eligible, we'll invite you to complete your full researcher profile. It takes about 3 minutes.</p>
+
+    <div class="info-panel green">
+      <div class="info-panel-title">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3M7 9.5h.01"/></svg>
+        Two-step onboarding
+      </div>
+      <div class="info-panel-body">This Expression of Interest is step one. After a quick eligibility check by our team, you'll receive an invitation to build your full profile — including publications, industry experience, and availability. <strong>You won't be asked for bank details or sensitive information at this stage.</strong></div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">01</span><span class="form-block-title">About You</span></div>
+      <div class="form-block-body">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Full Name <span class="req">*</span></label><input type="text" class="form-input" placeholder="Dr. Maya Krishnamurthy"></div>
+          <div class="form-group"><label class="form-label">Institutional Email <span class="req">*</span></label><input type="email" class="form-input" placeholder="firstname.lastname@unsw.edu.au"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Institution / Affiliation <span class="req">*</span></label><input type="text" class="form-input" placeholder="UNSW Sydney"></div>
+          <div class="form-group"><label class="form-label">Title / Role <span class="req">*</span></label><input type="text" class="form-input" placeholder="Senior Research Fellow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">02</span><span class="form-block-title">Your Research Area</span></div>
+      <div class="form-block-body">
+        <div class="form-group">
+          <label class="form-label">Primary Area of Research <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select your primary domain…</option>
+            <option>Solar / Photovoltaics</option>
+            <option>Battery Storage / Electrochemistry</option>
+            <option>Green Hydrogen / Electrolysis</option>
+            <option>Carbon Capture &amp; Storage</option>
+            <option>Wind / Tidal Energy</option>
+            <option>Grid Technology / Smart Energy</option>
+            <option>Advanced Materials (Cleantech)</option>
+            <option>Other Cleantech Domain</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">High-Level Expertise Summary <span class="req">*</span></label>
+          <textarea class="form-textarea" placeholder="2–3 sentences on your area of expertise and the kinds of technologies you'd be well placed to assess. This helps us confirm fit."></textarea>
+          <p class="form-hint">No need for detail here — your full profile comes later. Just enough to confirm your expertise aligns with our cleantech focus.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">University Profile or LinkedIn URL <span class="req">*</span></label>
+          <input type="url" class="form-input" placeholder="https://research.unsw.edu.au/people/…">
+          <p class="form-hint">A link we can use to confirm your affiliation and background.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">03</span><span class="form-block-title">Consent</span></div>
+      <div class="form-block-body">
+        <div class="consent-item" onclick="toggleConsent(this)">
+          <div class="consent-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+          <div class="consent-text">I consent to Deep Diligence storing and processing the information provided in this form for the purpose of assessing my eligibility, in accordance with the <strong>Privacy Policy</strong>. I understand this is a preliminary expression of interest and does not constitute registration.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goEoi(2)">Submit Expression of Interest →</button>
+      <button class="btn-ghost" onclick="showFlow('home')">← Back to journey</button>
+    </div>
+  </div>
+
+  <!-- Screen 2 — submitted -->
+  <div class="page-wrap has-progress screen" id="eoi-2">
+    <div class="confirm-screen">
+      <div class="confirm-icon"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4,14 10,20 24,8"/></svg></div>
+      <div class="confirm-ref">EOI-2025-0312 · RECEIVED</div>
+      <h1 class="screen-title" style="text-align:center;">Interest<br><em>registered</em></h1>
+      <p class="screen-sub" style="margin:0.75rem auto 0;text-align:center;">Thank you. We've sent a confirmation to your email. Our team will review your expression of interest for basic eligibility.</p>
+
+      <div class="confirm-steps">
+        <div class="confirm-step">
+          <span class="confirm-step-n">NEXT 01</span>
+          <div><div class="confirm-step-title">Eligibility check (1–2 business days)</div><div class="confirm-step-body">Our team confirms your affiliation and that your expertise aligns with our cleantech focus. This is a light-touch fit check, not a full verification.</div></div>
+        </div>
+        <div class="confirm-step">
+          <span class="confirm-step-n">NEXT 02</span>
+          <div><div class="confirm-step-title">Invitation to complete your profile</div><div class="confirm-step-body">If eligible, you'll receive an email with a secure link to build your full researcher profile — publications, industry experience, availability, and compliance declarations.</div></div>
+        </div>
+        <div class="confirm-step">
+          <span class="confirm-step-n">NEXT 03</span>
+          <div><div class="confirm-step-title">Full verification &amp; approval</div><div class="confirm-step-body">Once your full profile is submitted, our QA team verifies your credentials before publishing your profile to the researcher directory.</div></div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn-outline" onclick="showFlow('home')">Back to Journey</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FLOW 2 — WELCOME / ONBOARDING (post-approval)
+═══════════════════════════════════════════════════════════ -->
+<div class="flow" id="flow-welcome">
+  <div class="page-wrap no-progress">
+    <div class="welcome-hero">
+      <div class="welcome-badge">
+        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="2,6 5,9 10,3"/></svg>
+        Application Approved
+      </div>
+      <h1 class="screen-title" style="text-align:center;">Welcome to<br>Deep Diligence, <em>Dr. Krishnamurthy</em></h1>
+      <p class="screen-sub" style="margin:0.75rem auto 0;text-align:center;">Your profile has been verified and published to the researcher directory. Here's everything you need to get ready for your first review request.</p>
+    </div>
+
+    <!-- Activation checklist -->
+    <div class="checklist" style="margin-bottom:2rem;">
+      <div class="checklist-hd">Activation Checklist — 2 of 4 complete</div>
+      <div class="checklist-item">
+        <div class="checklist-check done"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg></div>
+        <span class="checklist-label done">Profile verified &amp; published</span>
+        <span class="checklist-status">Done</span>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-check done"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg></div>
+        <span class="checklist-label done">Password set &amp; account activated</span>
+        <span class="checklist-status">Done</span>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg></div>
+        <span class="checklist-label">Complete Stripe payment verification</span>
+        <span class="checklist-action">Set up →</span>
+      </div>
+      <div class="checklist-item">
+        <div class="checklist-check"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg></div>
+        <span class="checklist-label">Confirm university approval for paid outside work</span>
+        <span class="checklist-action">Mark done →</span>
+      </div>
+    </div>
+
+    <!-- Onboarding materials -->
+    <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--mist);margin-bottom:1rem;">Onboarding Materials</div>
+    <div class="onboard-grid">
+      <div class="onboard-card">
+        <div class="onboard-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="2" width="14" height="16" rx="1"/><path d="M6 6h8M6 9h8M6 12h5"/></svg></div>
+        <div class="onboard-card-title">How Reviews Work</div>
+        <div class="onboard-card-body">A short guide to the two engagement types, what's expected in a written report, and how the standard assessments work.</div>
+        <span class="onboard-card-link">Read guide →</span>
+      </div>
+      <div class="onboard-card">
+        <div class="onboard-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 2l2.4 5 5.6.5-4 3.7 1.1 5.3L10 14l-5.1 2.5L6 11.2 2 7.5l5.6-.5z"/></svg></div>
+        <div class="onboard-card-title">Writing a Strong Report</div>
+        <div class="onboard-card-body">Best-practice examples of how to answer investor questions clearly while staying within technical efficacy scope.</div>
+        <span class="onboard-card-link">View examples →</span>
+      </div>
+      <div class="onboard-card">
+        <div class="onboard-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="16" height="12" rx="1"/><path d="M2 8h16"/></svg></div>
+        <div class="onboard-card-title">Getting Paid</div>
+        <div class="onboard-card-body">How and when payments are released, the 80/20 split, and what you're responsible for at tax time.</div>
+        <span class="onboard-card-link">Learn more →</span>
+      </div>
+      <div class="onboard-card">
+        <div class="onboard-card-icon"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="11" height="10" rx="1"/><path d="M6 3V2a2 2 0 014 0v1"/></svg></div>
+        <div class="onboard-card-title">Conflicts &amp; Compliance</div>
+        <div class="onboard-card-body">A reminder of your ongoing obligations: declaring conflicts, maintaining independence, and university approval.</div>
+        <span class="onboard-card-link">Review obligations →</span>
+      </div>
+    </div>
+
+    <div class="info-panel" style="margin-top:1.5rem;">
+      <div class="info-panel-title">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="10" height="9" rx="1"/><path d="M5 3V2a2 2 0 014 0v1"/></svg>
+        Before your first request
+      </div>
+      <div class="info-panel-body">If you haven't yet obtained approval from your institution for paid outside work, do this now — before your first review request arrives. You'll need this approval in place before accepting any paid engagement. <strong>A template approval letter is available in your onboarding materials.</strong></div>
+    </div>
+
+    <div class="btn-row" style="justify-content:center;">
+      <button class="btn-primary" onclick="alert('This would open the researcher dashboard.')">Go to My Dashboard →</button>
+      <button class="btn-ghost" onclick="showFlow('home')">← Back to journey</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FLOW 3 — CONSULTATION SCHEDULING
+═══════════════════════════════════════════════════════════ -->
+<div class="flow" id="flow-schedule">
+  <div class="page-wrap no-progress">
+    <div class="screen-eyebrow">Process Step 6–7 — Consultation Scheduling</div>
+    <h1 class="screen-title">Propose your<br><em>call times</em></h1>
+    <p class="screen-sub">You've accepted this engagement and the NDA is executed. Now propose 3 times that suit you and provide your video call link. The investor will confirm one slot, and you'll both receive a calendar invite.</p>
+
+    <!-- Engagement summary -->
+    <div class="sched-summary">
+      <div class="sched-summary-hd">
+        <span class="sched-summary-label">Accepted Engagement</span>
+        <span class="sched-summary-ref">DD-2025-038 · NDA Executed</span>
+      </div>
+      <div class="sched-summary-body">
+        <div class="sched-row"><span class="sched-row-key">Service</span><span class="sched-row-val">Expert Consultation — 1 hour</span></div>
+        <div class="sched-row"><span class="sched-row-key">Company</span><span class="sched-row-val">CarbonLoop Technologies</span></div>
+        <div class="sched-row"><span class="sched-row-key">Investment Firm</span><span class="sched-row-val">Tidal Capital</span></div>
+        <div class="sched-row"><span class="sched-row-key">Your fee</span><span class="sched-row-val">$200 AUD (on completion)</span></div>
+        <div class="sched-row"><span class="sched-row-key">Must be scheduled within</span><span class="sched-row-val" style="color:var(--warn);">5 business days</span></div>
+      </div>
+    </div>
+
+    <!-- Meeting link (resolves the "who hosts the call" question) -->
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">01</span><span class="form-block-title">Your Video Call Link</span></div>
+      <div class="form-block-body">
+        <div class="info-panel blue" style="margin-bottom:1.25rem;">
+          <div class="info-panel-title">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="9" height="8" rx="1"/><path d="M10 6l3-2v6l-3-2z"/></svg>
+            You host the call
+          </div>
+          <div class="info-panel-body">For consultations, you provide your own video link (Zoom, Teams, or Google Meet). Paste it below — we'll include it in the calendar invite to the investor once they confirm a time. The call stays between you and the firm, under the executed NDA.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Meeting Link <span class="req">*</span></label>
+          <input type="url" class="form-input" placeholder="https://unsw.zoom.us/j/… or Teams / Meet link">
+          <p class="form-hint">A standing personal meeting room link is fine — or generate a one-off link for this call.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Propose times -->
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">02</span><span class="form-block-title">Propose 3 Available Times</span></div>
+      <div class="form-block-body">
+        <p class="form-hint" style="margin-bottom:1.25rem;font-size:0.78rem;">Select 3 slots that suit you over the next 5 business days. The investor will pick one. All times shown in AEST.</p>
+
+        <div class="slot-grid" id="slot-grid">
+          <div class="time-slot" onclick="toggleSlot(this)"><div class="time-slot-day">Mon 7 Apr</div><div class="time-slot-date">10:00</div><div class="time-slot-time">AM AEST</div></div>
+          <div class="time-slot" onclick="toggleSlot(this)"><div class="time-slot-day">Mon 7 Apr</div><div class="time-slot-date">14:00</div><div class="time-slot-time">PM AEST</div></div>
+          <div class="time-slot" onclick="toggleSlot(this)"><div class="time-slot-day">Tue 8 Apr</div><div class="time-slot-date">09:30</div><div class="time-slot-time">AM AEST</div></div>
+          <div class="time-slot" onclick="toggleSlot(this)"><div class="time-slot-day">Tue 8 Apr</div><div class="time-slot-date">15:30</div><div class="time-slot-time">PM AEST</div></div>
+          <div class="time-slot" onclick="toggleSlot(this)"><div class="time-slot-day">Wed 9 Apr</div><div class="time-slot-date">11:00</div><div class="time-slot-time">AM AEST</div></div>
+          <div class="time-slot" onclick="toggleSlot(this)"><div class="time-slot-day">Thu 10 Apr</div><div class="time-slot-date">13:00</div><div class="time-slot-time">PM AEST</div></div>
+        </div>
+
+        <p class="form-hint" id="slot-counter" style="margin-top:1rem;">0 of 3 slots selected</p>
+      </div>
+    </div>
+
+    <!-- Optional clarifying questions (resolves the clarifying-questions yellow item) -->
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">03</span><span class="form-block-title">Clarifying Questions</span><span class="form-block-sub">Optional</span></div>
+      <div class="form-block-body">
+        <div class="info-panel green" style="margin-bottom:1.25rem;">
+          <div class="info-panel-title">
+            <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 9.5h.01M5.5 5.5a1.5 1.5 0 113 0c0 1-1.5 1-1.5 2.5"/></svg>
+            Need something before the call?
+          </div>
+          <div class="info-panel-body">If you need anything clarified before the consultation, send it here rather than by email — it keeps everything in one place under the NDA. The investor will be notified and can respond through the platform.</div>
+        </div>
+        <div class="form-group">
+          <textarea class="form-textarea" placeholder="e.g. 'Could you confirm whether the efficiency figures in the deck are lab-measured or modelled? It'll help me prepare.'  (optional)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="showSchedConfirm()">Send Proposed Times →</button>
+      <button class="btn-ghost" onclick="showFlow('home')">← Back to journey</button>
+    </div>
+  </div>
+
+  <!-- Scheduling confirmation -->
+  <div class="page-wrap no-progress screen" id="sched-confirm" style="display:none;">
+    <div class="confirm-screen">
+      <div class="confirm-icon"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4,14 10,20 24,8"/></svg></div>
+      <div class="confirm-ref">DD-2025-038 · TIMES PROPOSED</div>
+      <h1 class="screen-title" style="text-align:center;">Times sent to<br><em>Tidal Capital</em></h1>
+      <p class="screen-sub" style="margin:0.75rem auto 0;text-align:center;">Your proposed times and meeting link have been sent. The investor will confirm one slot, and you'll both receive a calendar invite.</p>
+
+      <div class="confirm-steps">
+        <div class="confirm-step">
+          <span class="confirm-step-n">NEXT 01</span>
+          <div><div class="confirm-step-title">Investor confirms a time</div><div class="confirm-step-body">Tidal Capital selects one of your three proposed slots. You'll be notified as soon as they confirm.</div></div>
+        </div>
+        <div class="confirm-step">
+          <span class="confirm-step-n">NEXT 02</span>
+          <div><div class="confirm-step-title">Calendar invite issued</div><div class="confirm-step-body">A calendar invite with your meeting link goes to both parties. The consultation is locked in.</div></div>
+        </div>
+        <div class="confirm-step">
+          <span class="confirm-step-n">NEXT 03</span>
+          <div><div class="confirm-step-title">Hold the call &amp; submit summary</div><div class="confirm-step-body">Run the 1-hour consultation, then submit a brief written summary within 24 hours. Your $200 fee is released once the firm confirms completion.</div></div>
+        </div>
+      </div>
+
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn-outline" onclick="showFlow('home')">Back to Journey</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     RESOLVED QUESTIONS (reference)
+═══════════════════════════════════════════════════════════ -->
+<div class="flow" id="flow-resolved">
+  <div class="page-wrap no-progress">
+    <div class="screen-eyebrow">Reference</div>
+    <h1 class="screen-title">Resolved open<br><em>questions</em></h1>
+    <p class="screen-sub">The five yellow-highlighted items from the end-to-end process document, and the call made on each to keep things moving.</p>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">Q1</span><span class="form-block-title">NDA timing — before info shared?</span></div>
+      <div class="form-block-body">
+        <div style="font-size:0.78rem;color:var(--mist);font-style:italic;margin-bottom:0.75rem;font-weight:300;">"NDA auto executed at this point before information provided for review?"</div>
+        <div style="font-size:0.85rem;color:var(--charcoal);line-height:1.65;"><strong style="color:var(--res-ink);">Resolved — Yes.</strong> The NDA is auto-generated and e-signed by both parties the moment the researcher accepts, before any company materials are shared. For consultations the same applies: accept → NDA executes → then scheduling and materials.</div>
+      </div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">Q2</span><span class="form-block-title">Clarifying questions — how?</span></div>
+      <div class="form-block-body">
+        <div style="font-size:0.78rem;color:var(--mist);font-style:italic;margin-bottom:0.75rem;font-weight:300;">"Requests clarifying questions? (do so via email correspondence?)"</div>
+        <div style="font-size:0.85rem;color:var(--charcoal);line-height:1.65;"><strong style="color:var(--res-ink);">Resolved — In-platform, not email.</strong> Built into the scheduling flow (step 3 of the call setup). Keeps all correspondence under the NDA and auditable, rather than scattered across email. The investor is notified and responds through the platform.</div>
+      </div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">Q3</span><span class="form-block-title">Who hosts the video call?</span></div>
+      <div class="form-block-body">
+        <div style="font-size:0.78rem;color:var(--mist);font-style:italic;margin-bottom:0.75rem;font-weight:300;">"Platform used to host video call? Or individual meeting link provided by researcher?"</div>
+        <div style="font-size:0.85rem;color:var(--charcoal);line-height:1.65;"><strong style="color:var(--res-ink);">Resolved — Researcher provides the link.</strong> For MVP, the researcher pastes their own Zoom/Teams/Meet link during scheduling. The platform stores it and includes it in the calendar invite. Avoids building video infrastructure now; can revisit a native solution later.</div>
+      </div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">Q4</span><span class="form-block-title">Profile form reference</span></div>
+      <div class="form-block-body">
+        <div style="font-size:0.78rem;color:var(--mist);font-style:italic;margin-bottom:0.75rem;font-weight:300;">"(see other researcher profile doc)"</div>
+        <div style="font-size:0.85rem;color:var(--charcoal);line-height:1.65;"><strong style="color:var(--res-ink);">Resolved — Fields aligned to the template.</strong> The full profile (in the registration flow) now reflects the profile template: one-liner, primary/secondary expertise, short + full bio, industry/advisory experience, Scopus ID, ORCID, career summary, availability per fortnight, and the compliance checkboxes including IP acknowledgement and liability insurance.</div>
+      </div>
+    </div>
+
+    <div class="form-block">
+      <div class="form-block-hd"><span class="form-block-num">Q5</span><span class="form-block-title">Welcome &amp; onboarding materials</span></div>
+      <div class="form-block-body">
+        <div style="font-size:0.78rem;color:var(--mist);font-style:italic;margin-bottom:0.75rem;font-weight:300;">"welcome email and onboarding materials (to be created)"</div>
+        <div style="font-size:0.85rem;color:var(--charcoal);line-height:1.65;"><strong style="color:var(--res-ink);">Resolved — Welcome page built.</strong> The post-approval Welcome &amp; Onboarding page includes an activation checklist (Stripe setup, university approval) and four onboarding guides: how reviews work, writing a strong report, getting paid, and conflicts &amp; compliance.</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-outline" onclick="showFlow('home')">← Back to journey</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ─── FLOW NAVIGATION ──────────────────────────────────────
+function showFlow(id) {
+  document.querySelectorAll('.flow').forEach(f => f.classList.remove('active'));
+  document.getElementById('flow-' + id).classList.add('active');
+
+  // progress bar only for eoi
+  document.getElementById('eoi-progress').classList.toggle('show', id === 'eoi');
+
+  // nav tab highlight
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const tabMap = { eoi:0, welcome:1, schedule:2 };
+  if (id in tabMap) {
+    document.querySelectorAll('.nav-tab')[tabMap[id]].classList.add('active');
+  }
+
+  // reset eoi to screen 1
+  if (id === 'eoi') goEoi(1);
+  if (id === 'schedule') {
+    document.querySelectorAll('#flow-schedule .page-wrap').forEach(p => p.style.display = '');
+    document.getElementById('sched-confirm').style.display = 'none';
+  }
+
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+function showResolved() { showFlow('resolved'); }
+
+// ─── EOI ──────────────────────────────────────────────────
+function goEoi(n) {
+  document.querySelectorAll('#flow-eoi .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('eoi-' + n).classList.add('active');
+  for (let i=1;i<=2;i++){
+    const step = document.getElementById('eprog-'+i);
+    step.classList.remove('active','done');
+    if (i<n) step.classList.add('done'); else if(i===n) step.classList.add('active');
+  }
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// ─── CONSENT ──────────────────────────────────────────────
+function toggleConsent(item) {
+  item.querySelector('.consent-checkbox').classList.toggle('checked');
+}
+
+// ─── SLOTS ────────────────────────────────────────────────
+function toggleSlot(slot) {
+  const selected = document.querySelectorAll('.time-slot.selected');
+  if (!slot.classList.contains('selected') && selected.length >= 3) {
+    return; // max 3
+  }
+  slot.classList.toggle('selected');
+  const count = document.querySelectorAll('.time-slot.selected').length;
+  document.getElementById('slot-counter').textContent = count + ' of 3 slots selected';
+}
+
+// ─── SCHEDULING CONFIRM ───────────────────────────────────
+function showSchedConfirm() {
+  document.querySelectorAll('#flow-schedule .page-wrap').forEach(p => p.style.display='none');
+  document.getElementById('sched-confirm').style.display='';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+</script>
+</body>
+</html>

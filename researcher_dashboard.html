@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Diligence — Researcher Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --ivory:      #F7F4EE;
+  --paper:      #EFEBD8;
+  --parchment:  #E6E0D4;
+  --obsidian:   #161412;
+  --charcoal:   #2A2520;
+  --ash:        #5C5650;
+  --mist:       #9A958E;
+  --rule:       #D5CFC6;
+  --faint:      #ECE8E1;
+  --copper:     #8C5E38;
+  --copper-lt:  #B07D50;
+  --copper-dim: #F0E8DE;
+  --confirm:    #2D5A3D;
+  --confirm-bg: #EAF2EC;
+  --warn:       #6B4A12;
+  --warn-bg:    #F5EDDC;
+  --error:      #7A1F1F;
+  --error-bg:   #F5EAEA;
+  --res-ink:    #1A3A28;
+  --res-bg:     #EAF2EE;
+  --res-mid:    #2D5A3D;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--ivory);
+  color: var(--obsidian);
+  -webkit-font-smoothing: antialiased;
+  display: flex; min-height: 100vh;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: var(--obsidian);
+  position: fixed; top: 0; left: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  z-index: 100; overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 1.5rem 1.5rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.sidebar-logotype {
+  width: 28px; height: 28px;
+  border: 1px solid var(--copper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  color: var(--copper); letter-spacing: 0.04em; flex-shrink: 0;
+}
+.sidebar-brand {
+  font-family: 'Playfair Display', serif; font-weight: 500;
+  font-size: 0.95rem; color: var(--ivory); line-height: 1.1;
+}
+.sidebar-brand-sub {
+  font-size: 0.6rem; color: rgba(255,255,255,0.3);
+  letter-spacing: 0.1em; text-transform: uppercase; display: block;
+  margin-top: 0.2rem; font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Researcher identity block */
+.sidebar-identity {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-avatar {
+  width: 44px; height: 44px; background: var(--res-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 1rem;
+  font-weight: 500; color: var(--ivory); margin-bottom: 0.75rem;
+}
+.sidebar-name {
+  font-size: 0.82rem; font-weight: 500; color: var(--ivory); margin-bottom: 0.15rem;
+}
+.sidebar-role {
+  font-size: 0.68rem; color: rgba(255,255,255,0.4); font-weight: 300; line-height: 1.4;
+}
+.sidebar-rating {
+  display: flex; align-items: center; gap: 0.4rem; margin-top: 0.6rem;
+}
+.sidebar-stars { display: flex; gap: 2px; }
+.sidebar-star { width: 10px; height: 10px; }
+.sidebar-star.full path { fill: var(--copper-lt); }
+.sidebar-star.empty path { fill: rgba(255,255,255,0.15); }
+.sidebar-rating-text {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem;
+  color: rgba(255,255,255,0.4);
+}
+
+/* Nav items */
+.sidebar-nav { padding: 0.75rem 0; flex: 1; }
+.nav-section-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem;
+  color: rgba(255,255,255,0.25); letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 0.85rem 1.5rem 0.4rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.65rem 1.5rem; cursor: pointer;
+  transition: background 0.15s; position: relative;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); }
+.nav-item.active { background: rgba(255,255,255,0.08); }
+.nav-item.active::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--copper);
+}
+.nav-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.35);
+}
+.nav-icon svg { width: 16px; height: 16px; }
+.nav-item.active .nav-icon { color: rgba(255,255,255,0.8); }
+.nav-label {
+  font-size: 0.8rem; font-weight: 400; color: rgba(255,255,255,0.45);
+  transition: color 0.15s;
+}
+.nav-item.active .nav-label { color: var(--ivory); font-weight: 500; }
+.nav-item:hover .nav-label { color: rgba(255,255,255,0.7); }
+.nav-badge {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  background: var(--copper); color: var(--ivory);
+  padding: 0.12rem 0.45rem; font-weight: 500;
+}
+.nav-badge.urgent { background: var(--error); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+.sidebar-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+.sidebar-footer-link {
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 0.72rem; color: rgba(255,255,255,0.3);
+  cursor: pointer; padding: 0.4rem 0; transition: color 0.15s;
+  background: none; border: none; width: 100%; text-align: left;
+}
+.sidebar-footer-link:hover { color: rgba(255,255,255,0.6); }
+.sidebar-footer-link svg { width: 14px; height: 14px; }
+
+/* ─── MAIN CONTENT ────────────────────────────────────────── */
+.main {
+  margin-left: 240px; flex: 1; min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+.topbar {
+  background: rgba(247,244,238,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+  padding: 0 2.5rem; height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title {
+  font-family: 'Playfair Display', serif; font-weight: 500;
+  font-size: 1.05rem; color: var(--obsidian);
+}
+.topbar-right {
+  display: flex; align-items: center; gap: 1.25rem;
+}
+.topbar-notif {
+  width: 32px; height: 32px; border: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ash); position: relative;
+  transition: all 0.15s;
+}
+.topbar-notif:hover { border-color: var(--obsidian); color: var(--obsidian); }
+.topbar-notif svg { width: 15px; height: 15px; }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 6px; height: 6px; background: var(--copper); border-radius: 50%;
+}
+.topbar-btn {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.65rem;
+  font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--res-ink); color: var(--ivory);
+  border: none; padding: 0.5rem 1.1rem; cursor: pointer; transition: background 0.15s;
+}
+.topbar-btn:hover { background: var(--res-mid); }
+
+.content { padding: 2rem 2.5rem; flex: 1; }
+
+/* ─── PAGE VIEWS ──────────────────────────────────────────── */
+.view { display: none; animation: fadeUp 0.3s ease both; }
+.view.active { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── SHARED COMPONENTS ───────────────────────────────────── */
+.page-hd { margin-bottom: 2rem; }
+.page-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: var(--copper); letter-spacing: 0.14em; text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.page-title {
+  font-family: 'Playfair Display', serif; font-weight: 400;
+  font-size: clamp(1.5rem, 2.5vw, 2rem); color: var(--obsidian);
+}
+.page-title em { font-style: italic; color: var(--copper); }
+
+/* Cards */
+.card {
+  background: var(--ivory); border: 1px solid var(--rule);
+  border-top: 2px solid var(--obsidian);
+}
+.card.green-top { border-top-color: var(--res-ink); }
+.card.copper-top { border-top-color: var(--copper); }
+.card.warn-top { border-top-color: var(--warn); }
+.card.error-top { border-top-color: var(--error); }
+.card-hd {
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--faint);
+}
+.card-title {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--charcoal);
+}
+.card-action {
+  font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--copper); cursor: pointer;
+  background: none; border: none; transition: color 0.15s;
+}
+.card-action:hover { color: var(--copper-lt); }
+.card-body { padding: 1.5rem; }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 1.5rem; }
+.stat-block { background: var(--ivory); padding: 1.25rem 1.5rem; }
+.stat-block:hover { background: var(--faint); }
+.stat-label { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mist); margin-bottom: 0.5rem; }
+.stat-value { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400; color: var(--obsidian); line-height: 1; margin-bottom: 0.3rem; }
+.stat-sub { font-size: 0.72rem; color: var(--ash); font-weight: 300; }
+.stat-delta { font-size: 0.68rem; font-family: 'IBM Plex Mono', monospace; margin-top: 0.3rem; }
+.stat-delta.up { color: var(--confirm); }
+.stat-delta.down { color: var(--error); }
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--mist); padding: 0.6rem 1rem; text-align: left;
+  border-bottom: 1px solid var(--rule); background: var(--faint);
+}
+.data-table td {
+  padding: 0.9rem 1rem; font-size: 0.8rem; color: var(--charcoal);
+  border-bottom: 1px solid var(--faint); vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--faint); }
+
+/* Status badges */
+.badge {
+  display: inline-block; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; border: 1px solid; padding: 0.18rem 0.55rem;
+}
+.badge.pending  { color: var(--warn);    border-color: var(--warn);    background: var(--warn-bg); }
+.badge.active   { color: var(--res-ink); border-color: var(--res-ink); background: var(--res-bg); }
+.badge.complete { color: var(--confirm); border-color: var(--confirm); background: var(--confirm-bg); }
+.badge.new      { color: var(--copper);  border-color: var(--copper);  background: var(--copper-dim); }
+.badge.declined { color: var(--mist);    border-color: var(--rule);    background: var(--faint); }
+.badge.overdue  { color: var(--error);   border-color: var(--error);   background: var(--error-bg); }
+
+/* Two-col layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+
+/* Row actions */
+.row-actions { display: flex; gap: 0.5rem; align-items: center; }
+.btn-sm {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.62rem;
+  font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.4rem 0.85rem; border: 1px solid; cursor: pointer;
+  transition: all 0.15s; white-space: nowrap;
+}
+.btn-sm.primary { background: var(--res-ink); color: var(--ivory); border-color: var(--res-ink); }
+.btn-sm.primary:hover { background: var(--res-mid); border-color: var(--res-mid); }
+.btn-sm.outline { background: transparent; color: var(--obsidian); border-color: var(--rule); }
+.btn-sm.outline:hover { border-color: var(--obsidian); }
+.btn-sm.danger { background: transparent; color: var(--error); border-color: var(--error); }
+.btn-sm.danger:hover { background: var(--error); color: var(--ivory); }
+.btn-sm.copper { background: var(--copper); color: var(--ivory); border-color: var(--copper); }
+.btn-sm.copper:hover { background: var(--copper-lt); border-color: var(--copper-lt); }
+
+/* ─── DASHBOARD ───────────────────────────────────────────── */
+.urgent-banner {
+  background: var(--error-bg); border: 1px solid rgba(122,31,31,0.2);
+  border-left: 3px solid var(--error); padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;
+}
+.urgent-banner svg { width: 16px; height: 16px; color: var(--error); flex-shrink: 0; }
+.urgent-banner-text { font-size: 0.82rem; color: var(--charcoal); line-height: 1.5; }
+.urgent-banner-text strong { font-weight: 600; color: var(--error); }
+.urgent-banner-action {
+  margin-left: auto; white-space: nowrap;
+}
+
+/* Rating display */
+.rating-display {
+  display: flex; align-items: center; gap: 0.4rem;
+}
+.rating-stars { display: flex; gap: 2px; }
+.rating-star { width: 13px; height: 13px; }
+.rating-star.full path { fill: var(--copper); }
+.rating-star.half-star { position: relative; overflow: hidden; }
+.rating-star.empty path { fill: var(--rule); }
+.rating-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 500; color: var(--charcoal); }
+
+/* Timeline / activity feed */
+.activity-feed { display: flex; flex-direction: column; }
+.activity-item {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 1rem; padding: 0.9rem 0;
+  border-bottom: 1px solid var(--faint); align-items: start;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--rule); margin-top: 0.35rem; flex-shrink: 0;
+}
+.activity-dot.green { background: var(--confirm); }
+.activity-dot.copper { background: var(--copper); }
+.activity-dot.blue { background: var(--res-ink); }
+.activity-dot.red { background: var(--error); }
+.activity-text { font-size: 0.8rem; color: var(--charcoal); line-height: 1.5; }
+.activity-text strong { font-weight: 600; }
+.activity-time { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--mist); white-space: nowrap; margin-top: 0.2rem; }
+
+/* Countdown timer */
+.countdown {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem;
+  font-weight: 500; color: var(--error);
+}
+.countdown svg { width: 12px; height: 12px; }
+
+/* Progress bar */
+.progress-track { height: 3px; background: var(--parchment); margin-top: 0.5rem; }
+.progress-fill { height: 100%; transition: width 0.5s; }
+.progress-fill.green { background: var(--confirm); }
+.progress-fill.copper { background: var(--copper); }
+.progress-fill.red { background: var(--error); }
+
+/* ─── REQUESTS ─────────────────────────────────────────────── */
+.request-card {
+  border: 1px solid var(--rule); border-top: 2px solid var(--copper);
+  margin-bottom: 1rem; background: var(--ivory); transition: border-color 0.2s;
+}
+.request-card:hover { border-color: var(--charcoal); border-top-color: var(--copper); }
+.request-card.urgent-req { border-top-color: var(--error); }
+.request-hd {
+  padding: 1.25rem 1.5rem; display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 1rem;
+}
+.request-meta { display: flex; flex-direction: column; gap: 0.3rem; }
+.request-service {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: var(--copper); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.request-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 500; color: var(--obsidian); }
+.request-firm { font-size: 0.75rem; color: var(--ash); font-weight: 300; }
+.request-timing { text-align: right; flex-shrink: 0; }
+.request-received { font-size: 0.68rem; color: var(--mist); font-family: 'IBM Plex Mono', monospace; }
+
+.request-body {
+  padding: 0 1.5rem 1.25rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+.request-detail-label {
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--mist); margin-bottom: 0.4rem;
+}
+.request-detail-val { font-size: 0.82rem; color: var(--charcoal); line-height: 1.55; font-weight: 300; }
+.request-questions { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.25rem; }
+.request-questions li {
+  font-size: 0.76rem; color: var(--ash); display: flex; gap: 0.6rem;
+  padding: 0.3rem 0; border-bottom: 1px solid var(--faint); font-weight: 300;
+}
+.request-questions li:last-child { border-bottom: none; }
+.request-questions li::before {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  color: var(--copper); flex-shrink: 0; padding-top: 0.05rem;
+}
+.q1::before{content:"Q.01"} .q2::before{content:"Q.02"} .q3::before{content:"Q.03"}
+
+.request-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--rule); background: var(--faint);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.request-footer-note { font-size: 0.72rem; color: var(--mist); font-weight: 300; line-height: 1.4; }
+
+/* Conflict declare */
+.conflict-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1.5rem; background: rgba(122,31,31,0.04);
+  border-top: 1px solid rgba(122,31,31,0.1);
+}
+.conflict-checkbox {
+  width: 16px; height: 16px; border: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+}
+.conflict-checkbox.checked { background: var(--error); border-color: var(--error); }
+.conflict-checkbox svg { width: 8px; height: 8px; color: transparent; }
+.conflict-checkbox.checked svg { color: var(--ivory); }
+.conflict-label { font-size: 0.75rem; color: var(--charcoal); font-weight: 300; cursor: pointer; }
+
+/* ─── ACTIVE ENGAGEMENTS ───────────────────────────────────── */
+.engagement-card {
+  border: 1px solid var(--rule); border-top: 2px solid var(--res-ink);
+  margin-bottom: 1.5rem;
+}
+.engagement-hd {
+  padding: 1.25rem 1.5rem; background: var(--faint);
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.engagement-meta { display: flex; flex-direction: column; gap: 0.25rem; }
+.engagement-type {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  color: var(--res-ink); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.engagement-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 500; }
+.engagement-firm { font-size: 0.75rem; color: var(--ash); font-weight: 300; }
+.engagement-body { padding: 1.5rem; }
+.engagement-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+/* Deadline countdown */
+.deadline-block {
+  background: var(--warn-bg); border: 1px solid rgba(107,74,18,0.2);
+  padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between;
+}
+.deadline-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--warn); margin-bottom: 0.25rem; }
+.deadline-time { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--warn); }
+.deadline-sub { font-size: 0.68rem; color: var(--warn); font-weight: 300; }
+
+.deadline-block.ok { background: var(--confirm-bg); border-color: rgba(45,90,61,0.2); }
+.deadline-block.ok .deadline-label, .deadline-block.ok .deadline-time, .deadline-block.ok .deadline-sub { color: var(--confirm); }
+
+/* Q&A submit form */
+.qa-block { display: flex; flex-direction: column; gap: 0.75rem; }
+.qa-item { border: 1px solid var(--rule); }
+.qa-item-hd {
+  padding: 0.65rem 1rem; background: var(--faint);
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.qa-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: var(--copper); letter-spacing: 0.08em;
+}
+.qa-question { font-size: 0.78rem; font-weight: 500; color: var(--obsidian); }
+.qa-guidance { font-size: 0.7rem; color: var(--ash); font-weight: 300; font-style: italic; margin-top: 0.2rem; }
+.qa-answer {
+  width: 100%; border: none; padding: 0.85rem 1rem;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem;
+  font-weight: 300; color: var(--obsidian); resize: vertical;
+  min-height: 80px; line-height: 1.6; outline: none;
+  background: var(--ivory);
+}
+.qa-answer:focus { background: #FDFBF7; }
+
+.submit-panel {
+  background: var(--obsidian); padding: 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-top: 1rem;
+}
+.submit-panel-text { font-size: 0.78rem; color: rgba(247,244,238,0.5); font-weight: 300; line-height: 1.5; }
+.submit-panel-text strong { color: rgba(247,244,238,0.8); font-weight: 500; }
+.submit-btn {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.68rem;
+  font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--copper); color: var(--ivory); border: none;
+  padding: 0.8rem 1.75rem; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.submit-btn:hover { background: var(--copper-lt); }
+
+/* ─── PAST REPORTS ─────────────────────────────────────────── */
+.report-row {
+  display: grid; grid-template-columns: 1fr auto auto auto auto;
+  gap: 1rem; align-items: center; padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--faint); transition: background 0.15s;
+}
+.report-row:last-child { border-bottom: none; }
+.report-row:hover { background: var(--faint); }
+.report-company { font-weight: 500; font-size: 0.85rem; color: var(--obsidian); margin-bottom: 0.2rem; }
+.report-domain { font-size: 0.72rem; color: var(--ash); font-weight: 300; }
+.report-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--mist); }
+.report-amount { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--obsidian); }
+.report-stars { display: flex; gap: 2px; }
+.report-star { width: 12px; height: 12px; }
+.report-star.full path { fill: var(--copper); }
+.report-star.empty path { fill: var(--rule); }
+
+/* Feedback block */
+.feedback-block {
+  background: var(--copper-dim); border-left: 2px solid var(--copper);
+  padding: 0.85rem 1rem; font-size: 0.78rem; color: var(--charcoal);
+  line-height: 1.6; font-style: italic; font-weight: 300; margin-top: 0.5rem;
+}
+
+/* ─── PROFILE ──────────────────────────────────────────────── */
+.profile-grid { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start; }
+.profile-card-left { display: flex; flex-direction: column; gap: 1.5rem; }
+.profile-photo-block {
+  border: 1px solid var(--rule); border-top: 2px solid var(--res-ink);
+  padding: 1.5rem; text-align: center;
+}
+.profile-photo-avatar {
+  width: 80px; height: 80px; background: var(--res-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 1.8rem;
+  font-weight: 400; color: var(--ivory); margin: 0 auto 1rem;
+}
+.profile-photo-name { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 500; margin-bottom: 0.25rem; }
+.profile-photo-role { font-size: 0.76rem; color: var(--ash); font-weight: 300; line-height: 1.4; }
+.profile-photo-inst {
+  display: inline-block; margin-top: 0.6rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  color: var(--copper); border: 1px solid var(--copper); padding: 0.2rem 0.55rem;
+  letter-spacing: 0.08em;
+}
+.profile-stat-block {
+  border: 1px solid var(--rule); padding: 0; overflow: hidden;
+}
+.profile-stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 1rem; border-bottom: 1px solid var(--faint);
+}
+.profile-stat-row:last-child { border-bottom: none; }
+.profile-stat-key { font-size: 0.72rem; color: var(--ash); font-weight: 300; }
+.profile-stat-val { font-size: 0.82rem; font-weight: 500; color: var(--charcoal); }
+
+.form-group { margin-bottom: 1.2rem; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label-edit {
+  display: block; font-size: 0.62rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal);
+  margin-bottom: 0.4rem;
+}
+.form-input-edit, .form-textarea-edit, .form-select-edit {
+  width: 100%; border: 1px solid var(--rule); padding: 0.65rem 0.85rem;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 300;
+  color: var(--obsidian); background: var(--ivory); outline: none;
+  transition: border-color 0.15s; appearance: none; border-radius: 0;
+}
+.form-input-edit:focus, .form-textarea-edit:focus { border-color: var(--res-ink); }
+.form-textarea-edit { resize: vertical; min-height: 80px; line-height: 1.6; }
+.save-bar {
+  position: sticky; bottom: 0; background: var(--obsidian);
+  padding: 1rem 1.5rem; display: flex; align-items: center;
+  justify-content: space-between; margin-top: 1.5rem;
+}
+.save-bar-text { font-size: 0.75rem; color: rgba(247,244,238,0.4); font-weight: 300; }
+.save-btn {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.68rem;
+  font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--copper); color: var(--ivory); border: none;
+  padding: 0.7rem 1.5rem; cursor: pointer; transition: background 0.15s;
+}
+.save-btn:hover { background: var(--copper-lt); }
+
+/* ─── PAYMENTS ─────────────────────────────────────────────── */
+.payments-grid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+.earning-row {
+  display: grid; grid-template-columns: 1fr auto auto auto;
+  gap: 1rem; align-items: center;
+  padding: 1rem 1.5rem; border-bottom: 1px solid var(--faint);
+  transition: background 0.15s;
+}
+.earning-row:last-child { border-bottom: none; }
+.earning-row:hover { background: var(--faint); }
+.earning-company { font-weight: 500; font-size: 0.82rem; color: var(--obsidian); margin-bottom: 0.15rem; }
+.earning-type { font-size: 0.7rem; color: var(--ash); font-weight: 300; }
+.earning-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.63rem; color: var(--mist); }
+.earning-amount { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--obsidian); }
+.earning-status-paid { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--confirm); }
+.earning-status-pending { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warn); }
+
+.bank-details-block {
+  border: 1px solid var(--rule); border-top: 2px solid var(--res-ink);
+}
+.bank-detail-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--faint);
+}
+.bank-detail-row:last-child { border-bottom: none; }
+.bank-detail-key { font-size: 0.7rem; color: var(--ash); font-weight: 300; }
+.bank-detail-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--charcoal); }
+
+/* ─── EMPTY STATES ─────────────────────────────────────────── */
+.empty-state {
+  padding: 3rem 2rem; text-align: center;
+  border: 1px dashed var(--rule);
+}
+.empty-state-icon { width: 40px; height: 40px; border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--mist); }
+.empty-state-icon svg { width: 20px; height: 20px; }
+.empty-state-title { font-size: 0.88rem; font-weight: 500; color: var(--charcoal); margin-bottom: 0.4rem; }
+.empty-state-sub { font-size: 0.78rem; color: var(--mist); font-weight: 300; }
+
+/* ─── MODAL ────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(22,20,18,0.7); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 2rem;
+}
+.modal-overlay.open { display: flex; animation: fadeUp 0.2s ease both; }
+.modal-box { background: var(--ivory); border: 1px solid var(--rule); max-width: 540px; width: 100%; }
+.modal-hd {
+  background: var(--obsidian); padding: 1rem 1.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-hd-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: rgba(247,244,238,0.5); letter-spacing: 0.1em; text-transform: uppercase; }
+.modal-close { background: none; border: 1px solid rgba(247,244,238,0.2); color: rgba(247,244,238,0.5); width: 26px; height: 26px; cursor: pointer; font-size: 0.8rem; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.modal-close:hover { border-color: var(--ivory); color: var(--ivory); }
+.modal-body { padding: 1.75rem; }
+.modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--rule); display: flex; gap: 0.75rem; justify-content: flex-end; background: var(--faint); }
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .three-col { grid-template-columns: 1fr 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .sidebar { width: 60px; }
+  .sidebar-brand, .sidebar-identity, .nav-label, .nav-badge, .nav-section-label, .sidebar-footer-link span { display: none; }
+  .sidebar-logo { justify-content: center; padding: 1rem; }
+  .nav-item { justify-content: center; padding: 0.65rem; }
+  .nav-icon { width: 40px; height: 40px; }
+  .main { margin-left: 60px; }
+  .content { padding: 1.5rem; }
+  .two-col, .profile-grid, .payments-grid, .engagement-cols { grid-template-columns: 1fr; }
+  .request-body { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ══════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logotype">DD</div>
+    <div class="sidebar-brand">
+      Deep Diligence
+      <span class="sidebar-brand-sub">Researcher Portal</span>
+    </div>
+  </div>
+
+  <div class="sidebar-identity">
+    <div class="sidebar-avatar">MK</div>
+    <div class="sidebar-name">Dr. Maya Krishnamurthy</div>
+    <div class="sidebar-role">Senior Research Fellow · UNSW Sydney</div>
+    <div class="sidebar-rating">
+      <div class="sidebar-stars">
+        <svg class="sidebar-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+        <svg class="sidebar-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+        <svg class="sidebar-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+        <svg class="sidebar-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+        <svg class="sidebar-star empty" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+      </div>
+      <span class="sidebar-rating-text">4.0 · 12 reviews</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-item active" onclick="showView('dashboard')">
+      <div class="nav-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="6" height="6"/><rect x="10" y="2" width="6" height="6"/><rect x="2" y="10" width="6" height="6"/><rect x="10" y="10" width="6" height="6"/></svg></div>
+      <span class="nav-label">Dashboard</span>
+    </button>
+
+    <div class="nav-section-label">Work</div>
+    <button class="nav-item" onclick="showView('requests')">
+      <div class="nav-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4h12M3 8h8M3 12h10"/></svg></div>
+      <span class="nav-label">New Requests</span>
+      <span class="nav-badge urgent">2</span>
+    </button>
+    <button class="nav-item" onclick="showView('active')">
+      <div class="nav-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg></div>
+      <span class="nav-label">Active Work</span>
+      <span class="nav-badge">1</span>
+    </button>
+    <button class="nav-item" onclick="showView('reports')">
+      <div class="nav-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="2" width="12" height="14" rx="1"/><path d="M6 6h6M6 9h6M6 12h4"/></svg></div>
+      <span class="nav-label">Past Reports</span>
+    </button>
+
+    <div class="nav-section-label">Account</div>
+    <button class="nav-item" onclick="showView('profile')">
+      <div class="nav-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="6" r="3.5"/><path d="M2 16c0-3.866 3.134-7 7-7s7 3.134 7 7"/></svg></div>
+      <span class="nav-label">My Profile</span>
+    </button>
+    <button class="nav-item" onclick="showView('payments')">
+      <div class="nav-icon"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="5" width="14" height="10" rx="1"/><path d="M2 9h14"/><path d="M6 13h2"/></svg></div>
+      <span class="nav-label">Payments</span>
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-footer-link">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3M7 9.5h.01"/></svg>
+      <span>Help &amp; Support</span>
+    </button>
+    <button class="sidebar-footer-link" onclick="showView('dashboard')">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+      <span>Sign Out</span>
+    </button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-right">
+      <div class="topbar-notif">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2a5 5 0 00-5 5v3l-1 2h12l-1-2V7a5 5 0 00-5-5zM6.5 13.5a1.5 1.5 0 003 0"/></svg>
+        <div class="notif-dot"></div>
+      </div>
+      <button class="topbar-btn" onclick="showView('requests')">View New Requests</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ─── DASHBOARD ───────────────────────────────────────── -->
+    <div class="view active" id="view-dashboard">
+
+      <div class="urgent-banner">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 5v3M8 10.5h.01"/></svg>
+        <div class="urgent-banner-text">
+          <strong>2 new review requests require your response within 24 hours.</strong> Unanswered requests are auto-declined and affect your rating.
+        </div>
+        <div class="urgent-banner-action">
+          <button class="btn-sm primary" onclick="showView('requests')">View Requests →</button>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-block">
+          <div class="stat-label">Overall Rating</div>
+          <div class="stat-value">4.0</div>
+          <div class="rating-display" style="margin-top:0.4rem;">
+            <div class="rating-stars">
+              <svg class="rating-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              <svg class="rating-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              <svg class="rating-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              <svg class="rating-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              <svg class="rating-star empty" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+            </div>
+          </div>
+          <div class="stat-sub" style="margin-top:0.4rem;">Based on 12 reviews</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Total Earned</div>
+          <div class="stat-value">$14,400</div>
+          <div class="stat-sub">AUD · all time</div>
+          <div class="stat-delta up">↑ $1,800 this month</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Reviews Completed</div>
+          <div class="stat-value">12</div>
+          <div class="stat-sub">9 written · 3 consultations</div>
+          <div class="stat-delta up">↑ 2 this month</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Avg. Turnaround</div>
+          <div class="stat-value">4.2</div>
+          <div class="stat-sub">days (SLA: 5 days)</div>
+          <div class="stat-delta up">↑ On track</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+
+        <!-- Active work summary -->
+        <div class="card green-top">
+          <div class="card-hd">
+            <span class="card-title">Active Engagement</span>
+            <button class="card-action" onclick="showView('active')">View →</button>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:500;margin-bottom:0.2rem;">HydroGen Systems Pty Ltd</div>
+                <div style="font-size:0.72rem;color:var(--ash);font-weight:300;">Written Review + Consultation · Green Hydrogen</div>
+              </div>
+              <div class="deadline-block">
+                <div>
+                  <div class="deadline-label">Report Due</div>
+                  <div class="deadline-time">3 days</div>
+                  <div class="deadline-sub">Wednesday 9 April</div>
+                </div>
+                <button class="btn-sm primary" onclick="showView('active')">Continue Writing →</button>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--mist);margin-bottom:0.35rem;">
+                  <span>Report progress</span><span>6 of 10 questions answered</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill green" style="width:60%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="card">
+          <div class="card-hd"><span class="card-title">Recent Activity</span></div>
+          <div class="card-body" style="padding:0;">
+            <div class="activity-feed" style="padding:0.25rem 1.5rem;">
+              <div class="activity-item">
+                <div class="activity-dot red"></div>
+                <div class="activity-text"><strong>2 new review requests</strong> — respond within 24 hrs to avoid auto-decline</div>
+                <div class="activity-time">2 hrs ago</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div class="activity-text"><strong>$1,800 paid</strong> — Tidal Capital · Written Review accepted</div>
+                <div class="activity-time">3 days ago</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot copper"></div>
+                <div class="activity-text">NDA executed — HydroGen Systems · engagement started</div>
+                <div class="activity-time">4 days ago</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot green"></div>
+                <div class="activity-text"><strong>4.5 ★ rating received</strong> — Ironbark Growth Fund left feedback</div>
+                <div class="activity-time">1 week ago</div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot blue"></div>
+                <div class="activity-text">Profile view — 4 investment firms viewed your profile this week</div>
+                <div class="activity-time">Ongoing</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rating breakdown -->
+      <div class="card" style="margin-top:1.5rem;">
+        <div class="card-hd">
+          <span class="card-title">Rating Breakdown</span>
+          <span style="font-size:0.7rem;color:var(--mist);font-weight:300;">Based on last 12 reviews</span>
+        </div>
+        <div class="card-body">
+          <div class="three-col">
+            <div>
+              <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.85rem;">By Category</div>
+              <div style="display:flex;flex-direction:column;gap:0.65rem;">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem;"><span style="color:var(--ash);">Technical depth</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--confirm);">4.4</span></div>
+                  <div class="progress-track"><div class="progress-fill green" style="width:88%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem;"><span style="color:var(--ash);">Clarity of writing</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--confirm);">4.1</span></div>
+                  <div class="progress-track"><div class="progress-fill green" style="width:82%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem;"><span style="color:var(--ash);">Responsiveness</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--confirm);">3.8</span></div>
+                  <div class="progress-track"><div class="progress-fill green" style="width:76%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:0.3rem;"><span style="color:var(--ash);">Overall value</span><span style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--confirm);">3.9</span></div>
+                  <div class="progress-track"><div class="progress-fill green" style="width:78%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.85rem;">Star Distribution</div>
+              <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.72rem;">
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);width:14px;">5★</span>
+                  <div class="progress-track" style="flex:1;"><div class="progress-fill copper" style="width:42%"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);font-size:0.62rem;">5</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.72rem;">
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);width:14px;">4★</span>
+                  <div class="progress-track" style="flex:1;"><div class="progress-fill copper" style="width:50%"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);font-size:0.62rem;">6</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.72rem;">
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);width:14px;">3★</span>
+                  <div class="progress-track" style="flex:1;"><div class="progress-fill copper" style="width:8%"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);font-size:0.62rem;">1</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.72rem;">
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);width:14px;">2★</span>
+                  <div class="progress-track" style="flex:1;"><div class="progress-fill copper" style="width:0%"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);font-size:0.62rem;">0</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.72rem;">
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);width:14px;">1★</span>
+                  <div class="progress-track" style="flex:1;"><div class="progress-fill copper" style="width:0%"></div></div>
+                  <span style="font-family:'IBM Plex Mono',monospace;color:var(--mist);font-size:0.62rem;">0</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.85rem;">Latest Feedback</div>
+              <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                <div class="feedback-block">"Exceptional depth on the IP analysis. Exactly what we needed before the IC meeting." — Tidal Capital</div>
+                <div class="feedback-block">"Very clear writeup. Would have appreciated more specific data citations on the efficiency claims." — Ironbark Growth Fund</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard -->
+
+
+    <!-- ─── NEW REQUESTS ─────────────────────────────────────── -->
+    <div class="view" id="view-requests">
+      <div class="page-hd">
+        <div class="page-eyebrow">Pending Response</div>
+        <h1 class="page-title">New Review <em>Requests</em></h1>
+      </div>
+
+      <!-- Request 1 — urgent -->
+      <div class="request-card urgent-req">
+        <div class="request-hd">
+          <div class="request-meta">
+            <span class="request-service">Written Review + Consultation · $1,800 to you</span>
+            <div class="request-title">ElectroVault Energy Storage</div>
+            <div class="request-firm">Requested by Horizon Ventures · Battery Storage / Electrochemistry</div>
+          </div>
+          <div class="request-timing">
+            <div class="countdown">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1.5"/></svg>
+              18 hrs 42 min remaining
+            </div>
+            <div class="request-received" style="margin-top:0.3rem;">Received 5 hrs ago</div>
+          </div>
+        </div>
+        <div class="request-body">
+          <div>
+            <div class="request-detail-label">Technology Description</div>
+            <div class="request-detail-val">Advanced solid-state lithium-sulfur battery for grid-scale storage. Claims 3× energy density vs standard Li-ion with a proprietary sulfur-carbon composite cathode.</div>
+          </div>
+          <div>
+            <div class="request-detail-label">Sample Questions (10 total)</div>
+            <ul class="request-questions">
+              <li class="q1">Is the claimed 3× energy density improvement over standard Li-ion achievable at this TRL?</li>
+              <li class="q2">What are the primary cycle degradation mechanisms in sulfur-carbon composite cathodes?</li>
+              <li class="q3">Does the team's publication record support the technical claims made?</li>
+            </ul>
+            <div style="font-size:0.68rem;color:var(--mist);margin-top:0.5rem;font-weight:300;font-style:italic;">+ 7 more questions included in full brief</div>
+          </div>
+        </div>
+        <div class="conflict-row">
+          <div class="conflict-checkbox" id="cc1" onclick="toggleConflict('cc1')">
+            <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 3,6 7,2"/></svg>
+          </div>
+          <div class="conflict-label">I declare I have no conflict of interest with ElectroVault or any of its competitors. I have not provided advice to a competing company in this space in the last 12 months.</div>
+        </div>
+        <div class="request-footer">
+          <div class="request-footer-note">You have 18 hrs 42 min to respond. If you decline, you will not be penalised. If you accept and later withdraw, your rating will be affected.</div>
+          <div class="row-actions">
+            <button class="btn-sm danger" onclick="openDeclineModal()">Decline</button>
+            <button class="btn-sm primary" onclick="openAcceptModal('ElectroVault Energy Storage')">Accept Engagement →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Request 2 -->
+      <div class="request-card">
+        <div class="request-hd">
+          <div class="request-meta">
+            <span class="request-service">Expert Consultation · $200 to you</span>
+            <div class="request-title">CarbonLoop Technologies</div>
+            <div class="request-firm">Requested by Tidal Capital · Carbon Capture &amp; Storage</div>
+          </div>
+          <div class="request-timing">
+            <div class="countdown">
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 3v3l2 1.5"/></svg>
+              21 hrs 05 min remaining
+            </div>
+            <div class="request-received" style="margin-top:0.3rem;">Received 3 hrs ago</div>
+          </div>
+        </div>
+        <div class="request-body">
+          <div>
+            <div class="request-detail-label">Brief</div>
+            <div class="request-detail-val">Direct air capture startup with a novel amine-based sorbent. Firm wants to pressure-test efficiency claims and understand manufacturing cost at scale before a seed term sheet.</div>
+          </div>
+          <div>
+            <div class="request-detail-label">Engagement Type</div>
+            <div class="request-detail-val" style="margin-bottom:0.75rem;">1-hour video call. No written report required — brief written summary within 24hrs post-call.</div>
+            <div class="request-detail-label">Materials Provided</div>
+            <div class="request-detail-val">Pitch deck (attached) · 2 patent filings (links provided)</div>
+          </div>
+        </div>
+        <div class="conflict-row">
+          <div class="conflict-checkbox" id="cc2" onclick="toggleConflict('cc2')">
+            <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 3,6 7,2"/></svg>
+          </div>
+          <div class="conflict-label">I declare I have no conflict of interest with CarbonLoop Technologies or any of its competitors.</div>
+        </div>
+        <div class="request-footer">
+          <div class="request-footer-note">This is a consultation — estimated 2–3 hours total including call prep and summary.</div>
+          <div class="row-actions">
+            <button class="btn-sm danger" onclick="openDeclineModal()">Decline</button>
+            <button class="btn-sm primary" onclick="openAcceptModal('CarbonLoop Technologies')">Accept Engagement →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /requests -->
+
+
+    <!-- ─── ACTIVE WORK ──────────────────────────────────────── -->
+    <div class="view" id="view-active">
+      <div class="page-hd">
+        <div class="page-eyebrow">In Progress</div>
+        <h1 class="page-title">Active <em>Engagements</em></h1>
+      </div>
+
+      <div class="engagement-card">
+        <div class="engagement-hd">
+          <div class="engagement-meta">
+            <span class="engagement-type">Written Review + Consultation · Ref: DD-2025-031</span>
+            <div class="engagement-title">HydroGen Systems Pty Ltd</div>
+            <div class="engagement-firm">For Horizon Ventures · Green Hydrogen / Electrolysis · NDA executed 4 Apr 2025</div>
+          </div>
+          <div style="display:flex;gap:0.75rem;align-items:center;">
+            <span class="badge active">In Progress</span>
+            <span style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--obsidian);">$1,800</span>
+          </div>
+        </div>
+
+        <div class="engagement-body">
+          <div class="engagement-cols">
+
+            <div>
+              <div class="deadline-block" style="margin-bottom:1.25rem;">
+                <div>
+                  <div class="deadline-label">Report Due</div>
+                  <div class="deadline-time">3 days 4 hrs</div>
+                  <div class="deadline-sub">Wednesday 9 April 2025 · 5pm AEST</div>
+                </div>
+              </div>
+
+              <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.75rem;">Report Progress</div>
+              <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--ash);margin-bottom:0.35rem;"><span>Questions answered</span><span>6 / 10</span></div>
+              <div class="progress-track" style="margin-bottom:1.25rem;"><div class="progress-fill green" style="width:60%"></div></div>
+
+              <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.75rem;">Standard Assessments</div>
+              <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--faint);">
+                  <span style="font-size:0.78rem;color:var(--charcoal);">Scientific Validity</span>
+                  <span class="badge active">Drafted</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--faint);">
+                  <span style="font-size:0.78rem;color:var(--charcoal);">Team Credibility</span>
+                  <span class="badge active">Drafted</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;">
+                  <span style="font-size:0.78rem;color:var(--charcoal);">Overall Efficacy</span>
+                  <span class="badge pending">Pending</span>
+                </div>
+              </div>
+
+              <div style="margin-top:1.25rem;">
+                <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.5rem;">Materials from Firm</div>
+                <div style="display:flex;flex-direction:column;gap:0.4rem;">
+                  <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.78rem;color:var(--charcoal);padding:0.5rem;border:1px solid var(--rule);">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="1" width="10" height="12" rx="1"/><path d="M4 5h6M4 7h6M4 9h4"/></svg>
+                    HydroGen_PitchDeck_v4.pdf
+                  </div>
+                  <div style="display:flex;align-items:center;gap:0.75rem;font-size:0.78rem;color:var(--charcoal);padding:0.5rem;border:1px solid var(--rule);">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 1.5l.5 1.5h1.5l-1.2.9.5 1.5L7 4.5l-1.3.9.5-1.5-1.2-.9h1.5z"/><circle cx="7" cy="7" r="5.5"/></svg>
+                    AU2024001234 — Patent Filing
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.85rem;">Your 10 Questions — Answer Each Below</div>
+              <div class="qa-block">
+                <div class="qa-item">
+                  <div class="qa-item-hd">
+                    <span class="qa-num">Q.01</span>
+                    <div><div class="qa-question">Is the claimed 98% electrolysis efficiency achievable at commercial scale?</div><div class="qa-guidance">Firm wants specific comparison to published benchmarks.</div></div>
+                  </div>
+                  <textarea class="qa-answer" placeholder="Your answer…">The claimed 98% efficiency figure refers to voltage efficiency under idealised lab conditions (ambient temperature, small cell area). Published benchmarks for commercial PEM electrolysers typically achieve 65–82% system efficiency (HHV basis) at scale. The company's figure is not directly comparable without clarifying whether it accounts for balance-of-plant losses, thermal management, and degradation over time…</textarea>
+                </div>
+                <div class="qa-item">
+                  <div class="qa-item-hd">
+                    <span class="qa-num">Q.02</span>
+                    <div><div class="qa-question">What are the primary degradation mechanisms for the proprietary catalyst?</div></div>
+                  </div>
+                  <textarea class="qa-answer" placeholder="Your answer…">The iridium-oxide catalyst dissolution under dynamic load cycling is the primary known failure mechanism in PEM electrolysers at this TRL. The team's patent application (AU2024001234) describes a protective oxide shell approach — this is a credible strategy consistent with recent literature (Bernt et al. 2023, Nature Energy). However, accelerated ageing data beyond 1,000 hrs has not been publicly demonstrated…</textarea>
+                </div>
+                <div class="qa-item">
+                  <div class="qa-item-hd">
+                    <span class="qa-num">Q.03</span>
+                    <div><div class="qa-question">Does the team have the technical capability to execute on this roadmap?</div></div>
+                  </div>
+                  <textarea class="qa-answer" placeholder="Your answer…">The founding team's publication record is strong — Dr. Chen has 14 peer-reviewed papers in electrocatalysis, including two in Nature Chemistry. The CTO's background in industrial electrolyser manufacturing at Siemens Energy provides relevant scale-up experience. The team composition is a genuine strength of this opportunity…</textarea>
+                </div>
+                <div class="qa-item">
+                  <div class="qa-item-hd"><span class="qa-num">Q.04</span><div><div class="qa-question">What is the realistic timeline to TRL 7 given current progress?</div></div></div>
+                  <textarea class="qa-answer" placeholder="Your answer…"></textarea>
+                </div>
+                <div class="qa-item">
+                  <div class="qa-item-hd"><span class="qa-num">Q.05</span><div><div class="qa-question">Are the LCOE projections credible given current electrolyser cost curves?</div></div></div>
+                  <textarea class="qa-answer" placeholder="Your answer…"></textarea>
+                </div>
+                <div class="qa-item" style="border:1px dashed var(--rule);opacity:0.5;">
+                  <div class="qa-item-hd"><span class="qa-num">Q.06 — Q.10</span><div><div class="qa-question">5 more questions to complete…</div></div></div>
+                  <textarea class="qa-answer" placeholder="Continue below…" style="min-height:48px;"></textarea>
+                </div>
+              </div>
+
+              <div class="submit-panel">
+                <div class="submit-panel-text"><strong>Ready to submit?</strong> All 10 questions and 3 standard assessments must be completed. Once submitted, the firm will review within 24 hours and your payment will be released on acceptance.</div>
+                <button class="submit-btn" onclick="openSubmitModal()">Submit Report →</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /active -->
+
+
+    <!-- ─── PAST REPORTS ─────────────────────────────────────── -->
+    <div class="view" id="view-reports">
+      <div class="page-hd">
+        <div class="page-eyebrow">History</div>
+        <h1 class="page-title">Past <em>Reports</em></h1>
+      </div>
+
+      <div class="card">
+        <div class="card-hd">
+          <span class="card-title">12 Completed Engagements</span>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <select style="font-family:'IBM Plex Sans',sans-serif;font-size:0.72rem;border:1px solid var(--rule);padding:0.3rem 0.6rem;background:var(--ivory);color:var(--charcoal);outline:none;">
+              <option>All time</option><option>Last 6 months</option><option>Last 12 months</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <!-- Header row -->
+          <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:1rem;padding:0.6rem 1.5rem;background:var(--faint);border-bottom:1px solid var(--rule);">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--mist);">Company</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--mist);">Type</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--mist);">Date</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--mist);">Earned</span>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--mist);">Rating</span>
+          </div>
+
+          <!-- Rows -->
+          <div class="report-row">
+            <div>
+              <div class="report-company">Tidal Capital — Offshore Wind Array</div>
+              <div class="report-domain">Wind / Tidal Energy · Written Review</div>
+              <div class="feedback-block" style="margin-top:0.5rem;">"Exceptional depth on the IP analysis." — Tidal Capital</div>
+            </div>
+            <span class="badge complete">Complete</span>
+            <div class="report-date">28 Mar 2025</div>
+            <div class="report-amount">$1,800</div>
+            <div>
+              <div class="rating-display">
+                <div class="report-stars">
+                  <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                  <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                  <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                  <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                  <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-row">
+            <div>
+              <div class="report-company">Ironbark Growth Fund — Organic PV</div>
+              <div class="report-domain">Solar / Photovoltaics · Written Review</div>
+              <div class="feedback-block" style="margin-top:0.5rem;">"Clear writeup. More data citations on efficiency claims would help." — Ironbark</div>
+            </div>
+            <span class="badge complete">Complete</span>
+            <div class="report-date">14 Mar 2025</div>
+            <div class="report-amount">$1,800</div>
+            <div>
+              <div class="report-stars">
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star empty" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-row">
+            <div>
+              <div class="report-company">Horizon Ventures — BIPV System</div>
+              <div class="report-domain">Solar / Photovoltaics · Expert Consultation</div>
+            </div>
+            <span class="badge complete">Complete</span>
+            <div class="report-date">2 Jan 2025</div>
+            <div class="report-amount">$200</div>
+            <div>
+              <div class="report-stars">
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star empty" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="report-row" style="opacity:0.6;">
+            <div>
+              <div class="report-company">Seed Capital Partners — Flow Battery</div>
+              <div class="report-domain">Battery Storage · Written Review · 9 more in history…</div>
+            </div>
+            <span class="badge complete">Complete</span>
+            <div class="report-date">Nov 2024</div>
+            <div class="report-amount">$1,800</div>
+            <div>
+              <div class="report-stars">
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+                <svg class="report-star full" viewBox="0 0 16 16"><path d="M8 1l1.85 3.75 4.15.6-3 2.92.71 4.13L8 10.25l-3.71 1.95.71-4.13L2 5.35l4.15-.6z"/></svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /reports -->
+
+
+    <!-- ─── PROFILE ──────────────────────────────────────────── -->
+    <div class="view" id="view-profile">
+      <div class="page-hd">
+        <div class="page-eyebrow">Account</div>
+        <h1 class="page-title">My <em>Profile</em></h1>
+      </div>
+
+      <div class="profile-grid">
+
+        <div class="profile-card-left">
+          <div class="profile-photo-block">
+            <div class="profile-photo-avatar">MK</div>
+            <div class="profile-photo-name">Dr. Maya Krishnamurthy</div>
+            <div class="profile-photo-role">Senior Research Fellow<br>Photovoltaic &amp; Renewable Energy Engineering</div>
+            <div class="profile-photo-inst">UNSW Sydney</div>
+            <div style="margin-top:1rem;">
+              <button class="btn-sm outline" style="width:100%;text-align:center;">Update Photo</button>
+            </div>
+          </div>
+
+          <div class="profile-stat-block">
+            <div class="profile-stat-row"><span class="profile-stat-key">Network status</span><span class="profile-stat-val" style="color:var(--confirm);">● Active</span></div>
+            <div class="profile-stat-row"><span class="profile-stat-key">Member since</span><span class="profile-stat-val">Feb 2024</span></div>
+            <div class="profile-stat-row"><span class="profile-stat-key">Total reviews</span><span class="profile-stat-val">12</span></div>
+            <div class="profile-stat-row"><span class="profile-stat-key">Overall rating</span><span class="profile-stat-val">4.0 / 5.0</span></div>
+            <div class="profile-stat-row"><span class="profile-stat-key">Avg. turnaround</span><span class="profile-stat-val">4.2 days</span></div>
+            <div class="profile-stat-row"><span class="profile-stat-key">Institution verified</span><span class="profile-stat-val" style="color:var(--confirm);">✓ Verified</span></div>
+            <div class="profile-stat-row"><span class="profile-stat-key">ORCID linked</span><span class="profile-stat-val" style="color:var(--confirm);">✓ Linked</span></div>
+          </div>
+
+          <div class="card" style="border-top-color:var(--warn);">
+            <div class="card-hd"><span class="card-title" style="color:var(--warn);">Availability</span></div>
+            <div class="card-body" style="padding:1rem;">
+              <div style="font-size:0.8rem;color:var(--charcoal);margin-bottom:0.5rem;">Currently accepting: <strong>Both services</strong></div>
+              <div style="font-size:0.78rem;color:var(--ash);font-weight:300;margin-bottom:0.75rem;">Max 2 reviews/month</div>
+              <button class="btn-sm outline" style="width:100%;text-align:center;">Update Availability</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card green-top">
+            <div class="card-hd"><span class="card-title">Profile Details</span><span style="font-size:0.7rem;color:var(--mist);font-weight:300;">Visible to investment firms</span></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label-edit">Research Bio</label>
+                <textarea class="form-textarea-edit" style="min-height:110px;">Dr. Krishnamurthy's research focuses on perovskite-silicon tandem solar cells and advanced thin-film deposition techniques. She holds a PhD from UNSW (2017) and has published extensively on efficiency limits and degradation mechanisms in next-generation photovoltaics. Visiting researcher at NREL (Colorado) and Fraunhofer ISE (Germany).</textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label-edit">Primary Domain</label>
+                <select class="form-select-edit">
+                  <option selected>Solar / Photovoltaics</option>
+                  <option>Battery Storage</option>
+                  <option>Green Hydrogen</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label-edit">Domain Tags</label>
+                <input type="text" class="form-input-edit" value="Solar / PV, Perovskite, Thin Film, TRL Assessment, Materials Science">
+              </div>
+              <div class="form-group">
+                <label class="form-label-edit">Key Publication 1</label>
+                <input type="text" class="form-input-edit" value="Krishnamurthy et al. (2023). Stability-efficiency trade-offs in perovskite-silicon tandem architectures. Nature Energy.">
+              </div>
+              <div class="form-group">
+                <label class="form-label-edit">Key Publication 2</label>
+                <input type="text" class="form-input-edit" value="Krishnamurthy et al. (2022). Defect passivation strategies for high-efficiency perovskite cells. ACS Energy Letters.">
+              </div>
+              <div class="form-group">
+                <label class="form-label-edit">Google Scholar URL</label>
+                <input type="url" class="form-input-edit" value="https://scholar.google.com/citations?user=xyz123">
+              </div>
+              <div class="form-group">
+                <label class="form-label-edit">Institutional Profile URL</label>
+                <input type="url" class="form-input-edit" value="https://research.unsw.edu.au/people/dr-maya-krishnamurthy">
+              </div>
+            </div>
+            <div class="save-bar">
+              <span class="save-bar-text">Changes are visible to firms immediately on save</span>
+              <button class="save-btn">Save Profile</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /profile -->
+
+
+    <!-- ─── PAYMENTS ─────────────────────────────────────────── -->
+    <div class="view" id="view-payments">
+      <div class="page-hd">
+        <div class="page-eyebrow">Earnings</div>
+        <h1 class="page-title">Payments &amp; <em>Earnings</em></h1>
+      </div>
+
+      <div class="payments-grid">
+        <div>
+          <!-- Summary stats -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);margin-bottom:1.5rem;">
+            <div style="background:var(--obsidian);padding:1.25rem 1.5rem;">
+              <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:rgba(247,244,238,0.35);margin-bottom:0.4rem;">Total Earned</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--ivory);font-weight:400;">$14,400</div>
+              <div style="font-size:0.7rem;color:rgba(247,244,238,0.4);font-weight:300;margin-top:0.2rem;">AUD · all time</div>
+            </div>
+            <div style="background:var(--ivory);padding:1.25rem 1.5rem;">
+              <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.4rem;">This Month</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--obsidian);font-weight:400;">$1,800</div>
+              <div style="font-size:0.7rem;color:var(--confirm);font-weight:300;margin-top:0.2rem;">↑ Paid 28 Mar</div>
+            </div>
+            <div style="background:var(--ivory);padding:1.25rem 1.5rem;">
+              <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--mist);margin-bottom:0.4rem;">Pending</div>
+              <div style="font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--warn);font-weight:400;">$1,800</div>
+              <div style="font-size:0.7rem;color:var(--warn);font-weight:300;margin-top:0.2rem;">HydroGen · on delivery</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd">
+              <span class="card-title">Payment History</span>
+              <select style="font-family:'IBM Plex Sans',sans-serif;font-size:0.72rem;border:1px solid var(--rule);padding:0.3rem 0.6rem;background:var(--ivory);color:var(--charcoal);outline:none;">
+                <option>All time</option><option>2025</option><option>2024</option>
+              </select>
+            </div>
+            <div>
+              <div class="earning-row">
+                <div><div class="earning-company">Tidal Capital — Offshore Wind</div><div class="earning-type">Written Review + Consultation</div></div>
+                <div class="earning-date">28 Mar 2025</div>
+                <div class="earning-amount">$1,800</div>
+                <div class="earning-status-paid">Paid</div>
+              </div>
+              <div class="earning-row">
+                <div><div class="earning-company">Ironbark Growth Fund — Organic PV</div><div class="earning-type">Written Review + Consultation</div></div>
+                <div class="earning-date">14 Mar 2025</div>
+                <div class="earning-amount">$1,800</div>
+                <div class="earning-status-paid">Paid</div>
+              </div>
+              <div class="earning-row">
+                <div><div class="earning-company">Horizon Ventures — BIPV</div><div class="earning-type">Expert Consultation</div></div>
+                <div class="earning-date">2 Jan 2025</div>
+                <div class="earning-amount">$200</div>
+                <div class="earning-status-paid">Paid</div>
+              </div>
+              <div class="earning-row">
+                <div><div class="earning-company">Seed Capital — Flow Battery</div><div class="earning-type">Written Review + Consultation</div></div>
+                <div class="earning-date">18 Nov 2024</div>
+                <div class="earning-amount">$1,800</div>
+                <div class="earning-status-paid">Paid</div>
+              </div>
+              <div class="earning-row" style="opacity:0.55;">
+                <div><div class="earning-company">8 earlier payments</div><div class="earning-type">2024 total: $8,800</div></div>
+                <div class="earning-date">2024</div>
+                <div class="earning-amount">$8,800</div>
+                <div class="earning-status-paid">Paid</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+          <!-- Pending payment -->
+          <div class="card warn-top">
+            <div class="card-hd"><span class="card-title" style="color:var(--warn);">Pending Payment</span></div>
+            <div class="card-body">
+              <div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--warn);margin-bottom:0.25rem;">$1,800 AUD</div>
+              <div style="font-size:0.78rem;color:var(--ash);font-weight:300;margin-bottom:0.75rem;">HydroGen Systems · Written Review<br>Released 2 business days after firm acceptance</div>
+              <div style="font-size:0.72rem;color:var(--warn);">Report due 9 April 2025</div>
+            </div>
+          </div>
+
+          <!-- Bank details -->
+          <div class="bank-details-block">
+            <div class="card-hd"><span class="card-title">Payment Details</span><button class="card-action" onclick="">Edit</button></div>
+            <div class="bank-detail-row"><span class="bank-detail-key">Bank</span><span class="bank-detail-val">Commonwealth Bank</span></div>
+            <div class="bank-detail-row"><span class="bank-detail-key">Account name</span><span class="bank-detail-val">M. Krishnamurthy</span></div>
+            <div class="bank-detail-row"><span class="bank-detail-key">BSB</span><span class="bank-detail-val">062-●●●</span></div>
+            <div class="bank-detail-row"><span class="bank-detail-key">Account No.</span><span class="bank-detail-val">●●●● ●●●4</span></div>
+            <div class="bank-detail-row"><span class="bank-detail-key">ABN</span><span class="bank-detail-val">Not provided</span></div>
+            <div class="bank-detail-row"><span class="bank-detail-key">GST registered</span><span class="bank-detail-val">No</span></div>
+            <div style="padding:1rem 1.25rem;border-top:1px solid var(--rule);">
+              <button class="btn-sm outline" style="width:100%;text-align:center;">Update Bank Details</button>
+            </div>
+          </div>
+
+          <!-- Tax note -->
+          <div style="border:1px solid var(--rule);border-left:3px solid var(--mist);padding:1rem 1.25rem;background:var(--faint);">
+            <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--mist);margin-bottom:0.4rem;">Tax Note</div>
+            <div style="font-size:0.75rem;color:var(--ash);line-height:1.6;font-weight:300;">You are responsible for declaring income from Deep Diligence reviews to the ATO. We do not withhold tax on payments. Annual payment summaries are available on request. Consult a tax professional regarding your obligations.</div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /payments -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+<!-- ─── ACCEPT MODAL ─────────────────────────────────────── -->
+<div class="modal-overlay" id="accept-modal" onclick="closeModalOutside(event,'accept-modal')">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <span class="modal-hd-title">Accept Engagement</span>
+      <button class="modal-close" onclick="closeModal('accept-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:500;margin-bottom:0.5rem;" id="accept-modal-company">ElectroVault Energy Storage</div>
+      <div style="font-size:0.8rem;color:var(--ash);font-weight:300;line-height:1.65;margin-bottom:1.25rem;">By accepting this engagement you confirm you have declared no conflict of interest and commit to delivering within the 5-day SLA. A mutual NDA will be auto-generated and sent to both parties for e-signature immediately.</div>
+      <div style="background:var(--confirm-bg);border:1px solid rgba(45,90,61,0.2);border-left:3px solid var(--confirm);padding:1rem 1.25rem;margin-bottom:1.25rem;">
+        <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--confirm);margin-bottom:0.35rem;">What happens next</div>
+        <div style="font-size:0.78rem;color:var(--charcoal);line-height:1.6;font-weight:300;">NDA auto-generated and emailed to you for e-signature → Company materials shared with you → 5-day delivery clock starts from NDA execution</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm outline" onclick="closeModal('accept-modal')">Cancel</button>
+      <button class="btn-sm primary" onclick="confirmAccept()">Confirm Acceptance →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── DECLINE MODAL ────────────────────────────────────── -->
+<div class="modal-overlay" id="decline-modal" onclick="closeModalOutside(event,'decline-modal')">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <span class="modal-hd-title">Decline Request</span>
+      <button class="modal-close" onclick="closeModal('decline-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:0.85rem;color:var(--charcoal);margin-bottom:1rem;line-height:1.6;">Declining is fine — there's no penalty for declining before acceptance. Please select a reason so we can improve matching.</div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;border:1px solid var(--rule);cursor:pointer;font-size:0.82rem;color:var(--charcoal);">
+          <input type="radio" name="decline-reason" style="accent-color:var(--res-ink);"> Outside my domain expertise
+        </label>
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;border:1px solid var(--rule);cursor:pointer;font-size:0.82rem;color:var(--charcoal);">
+          <input type="radio" name="decline-reason" style="accent-color:var(--res-ink);"> Conflict of interest
+        </label>
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;border:1px solid var(--rule);cursor:pointer;font-size:0.82rem;color:var(--charcoal);">
+          <input type="radio" name="decline-reason" style="accent-color:var(--res-ink);"> Capacity — too busy this week
+        </label>
+        <label style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;border:1px solid var(--rule);cursor:pointer;font-size:0.82rem;color:var(--charcoal);">
+          <input type="radio" name="decline-reason" style="accent-color:var(--res-ink);"> Other
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm outline" onclick="closeModal('decline-modal')">Cancel</button>
+      <button class="btn-sm danger" onclick="confirmDecline()">Decline Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SUBMIT MODAL ─────────────────────────────────────── -->
+<div class="modal-overlay" id="submit-modal" onclick="closeModalOutside(event,'submit-modal')">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <span class="modal-hd-title">Submit Report</span>
+      <button class="modal-close" onclick="closeModal('submit-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:500;margin-bottom:0.5rem;">HydroGen Systems — Written Review</div>
+      <div style="font-size:0.8rem;color:var(--ash);font-weight:300;line-height:1.65;margin-bottom:1.25rem;">Once submitted, the firm has 24 hours to accept your report. Your payment of $1,800 will be released automatically on acceptance. The 1.5-hour debrief call will be scheduled by the firm after reviewing the report.</div>
+      <div style="background:var(--warn-bg);border:1px solid rgba(107,74,18,0.2);border-left:3px solid var(--warn);padding:1rem 1.25rem;">
+        <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--warn);margin-bottom:0.35rem;">Before you submit</div>
+        <div style="font-size:0.78rem;color:var(--charcoal);line-height:1.6;font-weight:300;">Make sure all 10 questions are answered and all 3 standard assessments are complete. You cannot edit the report after submission.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm outline" onclick="closeModal('submit-modal')">Continue Editing</button>
+      <button class="btn-sm primary" onclick="confirmSubmit()">Submit Report →</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ─── NAVIGATION ───────────────────────────────────────────
+const titles = {
+  dashboard: 'Dashboard',
+  requests: 'New Requests',
+  active: 'Active Work',
+  reports: 'Past Reports',
+  profile: 'My Profile',
+  payments: 'Payments & Earnings'
+};
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[id] || id;
+  // Highlight correct nav item
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) {
+      n.classList.add('active');
+    }
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── CONFLICT TOGGLE ──────────────────────────────────────
+function toggleConflict(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('checked');
+}
+
+// ─── MODALS ───────────────────────────────────────────────
+function openAcceptModal(company) {
+  document.getElementById('accept-modal-company').textContent = company;
+  document.getElementById('accept-modal').classList.add('open');
+}
+function openDeclineModal() {
+  document.getElementById('decline-modal').classList.add('open');
+}
+function openSubmitModal() {
+  document.getElementById('submit-modal').classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function closeModalOutside(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+function confirmAccept() {
+  closeModal('accept-modal');
+  showView('active');
+}
+function confirmDecline() {
+  closeModal('decline-modal');
+  // Remove the first request card visually
+  const cards = document.querySelectorAll('.request-card');
+  if (cards.length > 0) cards[0].style.opacity = '0.35';
+}
+function confirmSubmit() {
+  closeModal('submit-modal');
+  showView('reports');
+}
+</script>
+</body>
+</html>

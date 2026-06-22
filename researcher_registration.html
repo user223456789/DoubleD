@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Diligence — Researcher Registration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ─── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --ivory:      #F7F4EE;
+  --paper:      #EFEBD8;
+  --parchment:  #E6E0D4;
+  --obsidian:   #161412;
+  --charcoal:   #2A2520;
+  --ash:        #5C5650;
+  --mist:       #9A958E;
+  --rule:       #D5CFC6;
+  --faint:      #ECE8E1;
+  --copper:     #8C5E38;
+  --copper-lt:  #B07D50;
+  --copper-dim: #F0E8DE;
+  --confirm:    #2D5A3D;
+  --confirm-bg: #EAF2EC;
+  --warn:       #6B4A12;
+  --warn-bg:    #F5EDDC;
+  --error:      #7A1F1F;
+  --error-bg:   #F5EAEA;
+  --res-ink:    #1A3A28;
+  --res-bg:     #EAF2EE;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--ivory);
+  color: var(--obsidian);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ─── NAV ────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(247,244,238,0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--rule);
+}
+.nav-inner {
+  max-width: 1160px; margin: 0 auto; padding: 0 3rem;
+  height: 60px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif; font-weight: 500; font-size: 1.1rem;
+  color: var(--obsidian); text-decoration: none;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.nav-logotype {
+  width: 28px; height: 28px; border: 1px solid var(--copper);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: var(--copper); letter-spacing: 0.04em;
+}
+.nav-back {
+  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ash); text-decoration: none;
+  display: flex; align-items: center; gap: 0.4rem; transition: color 0.15s; cursor: pointer; background: none; border: none;
+}
+.nav-back:hover { color: var(--obsidian); }
+
+/* ─── PROGRESS BAR ───────────────────────────────────────── */
+.progress-bar {
+  position: fixed; top: 60px; left: 0; right: 0; z-index: 199;
+  background: var(--res-bg); border-bottom: 1px solid rgba(42,80,56,0.15);
+}
+.progress-inner {
+  max-width: 1160px; margin: 0 auto; padding: 0 3rem;
+  display: flex; align-items: stretch;
+}
+.prog-step {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.85rem 0; flex: 1; position: relative; cursor: pointer;
+}
+.prog-step + .prog-step { padding-left: 1rem; }
+.prog-num {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border: 1px solid rgba(42,80,56,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; font-weight: 500;
+  color: var(--mist); background: var(--res-bg); transition: all 0.2s;
+}
+.prog-label {
+  font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--mist); transition: color 0.2s; white-space: nowrap;
+}
+.prog-step.active .prog-num { background: var(--res-ink); border-color: var(--res-ink); color: var(--ivory); }
+.prog-step.active .prog-label { color: var(--res-ink); }
+.prog-step.done .prog-num { background: var(--confirm); border-color: var(--confirm); color: var(--ivory); }
+.prog-step.done .prog-label { color: var(--confirm); }
+.prog-track { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: transparent; }
+.prog-step.active .prog-track { background: var(--res-ink); }
+.prog-step.done .prog-track { background: var(--confirm); }
+
+/* ─── LAYOUT ─────────────────────────────────────────────── */
+.page-wrap { max-width: 780px; margin: 0 auto; padding: 140px 3rem 6rem; }
+.screen { display: none; animation: riseIn 0.4s ease both; }
+.screen.active { display: block; }
+@keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── SCREEN HEADERS ─────────────────────────────────────── */
+.screen-eyebrow {
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--res-ink); margin-bottom: 0.75rem;
+}
+.screen-title {
+  font-family: 'Playfair Display', serif; font-weight: 400;
+  font-size: clamp(1.8rem, 3vw, 2.5rem); line-height: 1.1; margin-bottom: 0.75rem;
+}
+.screen-title em { font-style: italic; color: var(--copper); }
+.screen-sub {
+  font-size: 0.9rem; color: var(--ash); line-height: 1.75; font-weight: 300;
+  max-width: 560px; margin-bottom: 2.5rem;
+}
+
+/* ─── FORM BLOCKS ────────────────────────────────────────── */
+.form-block {
+  border: 1px solid var(--rule); border-top: 2px solid var(--res-ink);
+  margin-bottom: 1.5rem; background: var(--ivory);
+}
+.form-block-hd {
+  padding: 1.1rem 1.75rem; border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; gap: 1rem; background: var(--faint);
+}
+.form-block-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--copper); letter-spacing: 0.1em;
+}
+.form-block-title { font-size: 0.82rem; font-weight: 600; color: var(--obsidian); }
+.form-block-sub { font-size: 0.75rem; color: var(--ash); font-weight: 300; margin-left: auto; }
+.form-block-body { padding: 1.75rem; }
+
+/* ─── FORM ELEMENTS ──────────────────────────────────────── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { margin-bottom: 1.2rem; }
+.form-group:last-child { margin-bottom: 0; }
+.form-label {
+  display: block; font-size: 0.65rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--charcoal); margin-bottom: 0.45rem;
+}
+.form-label .req { color: var(--copper); margin-left: 0.2rem; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; background: var(--ivory); border: 1px solid var(--rule);
+  padding: 0.75rem 0.9rem; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.88rem; font-weight: 300; color: var(--obsidian);
+  outline: none; transition: border-color 0.15s; appearance: none; border-radius: 0;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--res-ink); }
+.form-input::placeholder, .form-textarea::placeholder { color: var(--mist); }
+.form-input.valid { border-color: var(--confirm); }
+.form-input.invalid { border-color: var(--error); }
+.form-textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+.form-hint { font-size: 0.72rem; color: var(--mist); margin-top: 0.4rem; font-weight: 300; line-height: 1.5; }
+.form-hint.warn { color: var(--warn); }
+.form-hint.error { color: var(--error); }
+.form-hint.ok { color: var(--confirm); }
+
+/* Email validation indicator */
+.email-row { position: relative; }
+.email-status {
+  position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%);
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.2rem 0.55rem; border: 1px solid;
+  opacity: 0; transition: opacity 0.2s;
+}
+.email-status.show { opacity: 1; }
+.email-status.valid { color: var(--confirm); border-color: var(--confirm); background: var(--confirm-bg); }
+.email-status.invalid { color: var(--error); border-color: var(--error); background: var(--error-bg); }
+.email-status.pending { color: var(--warn); border-color: var(--warn); background: var(--warn-bg); }
+
+/* Upload zone */
+.upload-zone {
+  border: 1px dashed var(--rule); padding: 1.5rem; text-align: center;
+  cursor: pointer; transition: all 0.2s; background: var(--ivory);
+  display: flex; align-items: center; gap: 1rem;
+}
+.upload-zone:hover { border-color: var(--res-ink); background: var(--res-bg); }
+.upload-zone.has-file { border-color: var(--confirm); background: var(--confirm-bg); border-style: solid; }
+.upload-icon {
+  width: 36px; height: 36px; border: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--ash);
+}
+.upload-icon svg { width: 16px; height: 16px; }
+.upload-text-block { text-align: left; }
+.upload-label { font-size: 0.82rem; font-weight: 500; color: var(--charcoal); }
+.upload-sub { font-size: 0.72rem; color: var(--mist); font-weight: 300; margin-top: 0.2rem; }
+.upload-zone.has-file .upload-label { color: var(--confirm); }
+
+/* ─── VERIFICATION PANEL ─────────────────────────────────── */
+.verify-panel {
+  background: var(--warn-bg); border: 1px solid rgba(107,74,18,0.2);
+  border-left: 3px solid var(--warn); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+}
+.verify-panel-title {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--warn); margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.verify-panel-title svg { width: 13px; height: 13px; }
+.verify-panel-body { font-size: 0.8rem; color: var(--charcoal); line-height: 1.65; font-weight: 300; }
+.verify-steps { list-style: none; margin-top: 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.verify-steps li { font-size: 0.78rem; color: var(--charcoal); display: flex; gap: 0.6rem; align-items: baseline; }
+.verify-steps li::before { content: '—'; font-size: 0.6rem; color: var(--warn); flex-shrink: 0; }
+
+/* ─── INSTITUTION DOMAINS ────────────────────────────────── */
+.domain-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-top: 0.75rem;
+}
+.domain-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem;
+  color: var(--mist); border: 1px solid var(--faint);
+  padding: 0.25rem 0.5rem; text-align: center; background: var(--faint);
+}
+
+/* ─── ORCID BLOCK ────────────────────────────────────────── */
+.orcid-block {
+  background: var(--faint); border: 1px solid var(--rule);
+  padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem;
+}
+.orcid-logo {
+  width: 36px; height: 36px; background: #A6CE39;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.55rem;
+  font-weight: 500; color: white; letter-spacing: 0.04em; text-align: center; line-height: 1.2;
+}
+.orcid-text { font-size: 0.78rem; color: var(--ash); line-height: 1.55; font-weight: 300; }
+.orcid-text strong { color: var(--charcoal); font-weight: 600; }
+
+/* ─── CHECKBOX / AGREE ITEMS ─────────────────────────────── */
+.agree-list { display: flex; flex-direction: column; gap: 0; }
+.agree-item {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 1rem; align-items: start; padding: 1.25rem 1.75rem;
+  border-bottom: 1px solid var(--faint); cursor: pointer;
+  transition: background 0.15s;
+}
+.agree-item:last-child { border-bottom: none; }
+.agree-item:hover { background: var(--faint); }
+.agree-item.critical { background: rgba(122,31,31,0.03); }
+.agree-item.critical:hover { background: rgba(122,31,31,0.06); }
+
+.agree-checkbox {
+  width: 20px; height: 20px; border: 1px solid var(--rule);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 0.1rem; transition: all 0.15s; background: var(--ivory);
+}
+.agree-checkbox.checked { background: var(--res-ink); border-color: var(--res-ink); }
+.agree-checkbox.checked.critical-check { background: var(--error); border-color: var(--error); }
+.agree-checkbox svg { width: 10px; height: 10px; color: transparent; }
+.agree-checkbox.checked svg { color: var(--ivory); }
+
+.agree-title {
+  font-size: 0.85rem; font-weight: 600; color: var(--obsidian); margin-bottom: 0.35rem; line-height: 1.3;
+}
+.agree-body { font-size: 0.78rem; color: var(--ash); line-height: 1.65; font-weight: 300; }
+.agree-tag {
+  display: inline-block; margin-top: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.56rem;
+  font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+  border: 1px solid; padding: 0.18rem 0.55rem;
+}
+.agree-tag.mandatory { color: var(--error); border-color: var(--error); }
+.agree-tag.important { color: var(--warn); border-color: var(--warn); }
+.agree-tag.standard { color: var(--mist); border-color: var(--rule); }
+
+/* ─── RATES TABLE ────────────────────────────────────────── */
+.rates-table { border: 1px solid var(--rule); border-top: 2px solid var(--res-ink); }
+.rates-hd {
+  background: var(--obsidian); display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 0.6rem 1.25rem; gap: 1rem;
+}
+.rates-hd span {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  font-weight: 500; color: rgba(247,244,238,0.45); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.rates-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 1rem 1.25rem; gap: 1rem; align-items: center;
+  border-bottom: 1px solid var(--faint);
+}
+.rates-row:last-child { border-bottom: none; }
+.rates-row:hover { background: var(--faint); }
+.rates-service { font-size: 0.85rem; font-weight: 500; color: var(--obsidian); }
+.rates-service-sub { font-size: 0.72rem; color: var(--ash); font-weight: 300; margin-top: 0.15rem; }
+.rates-amount {
+  font-family: 'Playfair Display', serif; font-size: 1.15rem;
+  font-weight: 400; color: var(--obsidian);
+}
+.rates-platform { font-size: 0.72rem; color: var(--mist); font-weight: 300; }
+.rates-time { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--charcoal); }
+
+/* ─── SLA COMMITMENTS ────────────────────────────────────── */
+.sla-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.sla-item { background: var(--ivory); padding: 1.25rem 1.5rem; }
+.sla-item:hover { background: var(--faint); }
+.sla-item-label {
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--mist); margin-bottom: 0.5rem;
+}
+.sla-item-value {
+  font-family: 'Playfair Display', serif; font-size: 1.2rem;
+  font-weight: 400; color: var(--obsidian); margin-bottom: 0.3rem;
+}
+.sla-item-desc { font-size: 0.76rem; color: var(--ash); font-weight: 300; line-height: 1.55; }
+
+/* ─── RATING WARNING ─────────────────────────────────────── */
+.rating-warn {
+  background: var(--warn-bg); border: 1px solid rgba(107,74,18,0.2);
+  border-top: 2px solid var(--warn); padding: 1.5rem; margin-top: 1.5rem;
+}
+.rating-warn-title {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--warn); margin-bottom: 0.75rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.rating-warn-title svg { width: 14px; height: 14px; }
+.rating-factors { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+.rating-factor {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.55rem 0.75rem; border-bottom: 1px solid rgba(107,74,18,0.1);
+}
+.rating-factor:last-child { border-bottom: none; }
+.rating-factor-label { font-size: 0.78rem; color: var(--charcoal); }
+.rating-factor-impact {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid; padding: 0.18rem 0.55rem;
+}
+.rating-factor-impact.high { color: var(--error); border-color: var(--error); }
+.rating-factor-impact.medium { color: var(--warn); border-color: var(--warn); }
+.rating-factor-impact.low { color: var(--mist); border-color: var(--rule); }
+
+/* ─── BANK DETAILS ───────────────────────────────────────── */
+.bank-note {
+  background: var(--confirm-bg); border: 1px solid rgba(45,90,61,0.2);
+  border-left: 3px solid var(--confirm); padding: 1rem 1.25rem; margin-bottom: 1.5rem;
+}
+.bank-note-title {
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--confirm); margin-bottom: 0.4rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.bank-note-title svg { width: 13px; height: 13px; }
+.bank-note-body { font-size: 0.78rem; color: var(--ash); line-height: 1.6; font-weight: 300; }
+
+/* ─── UNI APPROVAL ───────────────────────────────────────── */
+.approval-box {
+  border: 1px solid var(--rule); border-left: 3px solid var(--copper);
+  padding: 1.25rem 1.5rem; background: var(--copper-dim); margin-bottom: 1.5rem;
+}
+.approval-box-title {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--copper); margin-bottom: 0.5rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.approval-box-title svg { width: 13px; height: 13px; }
+.approval-box-body { font-size: 0.8rem; color: var(--charcoal); line-height: 1.65; font-weight: 300; }
+.approval-box-body strong { font-weight: 600; color: var(--obsidian); }
+.template-link {
+  display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.75rem;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--copper); border: 1px solid var(--copper); padding: 0.4rem 0.9rem;
+  cursor: pointer; transition: all 0.15s; background: transparent; text-decoration: none;
+}
+.template-link:hover { background: var(--copper); color: var(--ivory); }
+
+/* ─── REVIEW QUEUE PANEL ─────────────────────────────────── */
+.queue-panel {
+  background: var(--obsidian); padding: 2rem; margin-top: 2rem;
+}
+.queue-panel-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: rgba(247,244,238,0.4); letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.queue-panel-title {
+  font-family: 'Playfair Display', serif; font-size: 1.3rem;
+  font-weight: 400; color: var(--ivory); margin-bottom: 0.5rem;
+}
+.queue-panel-body { font-size: 0.8rem; color: rgba(247,244,238,0.55); line-height: 1.65; font-weight: 300; }
+.queue-steps { display: flex; flex-direction: column; gap: 0; margin-top: 1.25rem; }
+.queue-step {
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid rgba(247,244,238,0.07);
+  align-items: start;
+}
+.queue-step:last-child { border-bottom: none; }
+.queue-step-n {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem;
+  color: var(--copper-lt); letter-spacing: 0.06em; padding-top: 0.1rem;
+}
+.queue-step-text { font-size: 0.78rem; color: rgba(247,244,238,0.6); line-height: 1.5; font-weight: 300; }
+.queue-step-text strong { color: rgba(247,244,238,0.85); font-weight: 500; }
+
+/* ─── CONFIRMATION ───────────────────────────────────────── */
+.confirm-screen { text-align: center; max-width: 580px; margin: 0 auto; }
+.confirm-icon {
+  width: 64px; height: 64px; border: 1px solid var(--confirm);
+  background: var(--confirm-bg); display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 2rem;
+}
+.confirm-icon svg { width: 28px; height: 28px; color: var(--confirm); }
+.confirm-ref {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+  color: var(--copper); letter-spacing: 0.12em; margin-bottom: 1rem;
+}
+.confirm-next {
+  border: 1px solid var(--rule); border-top: 2px solid var(--res-ink);
+  margin-top: 2.5rem; text-align: left;
+}
+.confirm-next-row {
+  display: grid; grid-template-columns: auto 1fr; gap: 1.25rem;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.confirm-next-row:last-child { border-bottom: none; }
+.confirm-next-n {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+  color: var(--copper); letter-spacing: 0.06em; padding-top: 0.1rem;
+}
+.confirm-next-title { font-size: 0.85rem; font-weight: 600; color: var(--obsidian); margin-bottom: 0.3rem; }
+.confirm-next-body { font-size: 0.78rem; color: var(--ash); line-height: 1.6; font-weight: 300; }
+
+/* ─── BUTTONS ─────────────────────────────────────────────── */
+.btn-row { display: flex; gap: 1rem; align-items: center; margin-top: 2rem; flex-wrap: wrap; }
+.btn-primary {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; background: var(--res-ink);
+  color: var(--ivory); border: none; padding: 0.9rem 2rem; cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-primary:hover { background: var(--confirm); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-outline {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; background: transparent;
+  color: var(--res-ink); border: 1px solid var(--res-ink); padding: 0.9rem 2rem;
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-outline:hover { background: var(--res-ink); color: var(--ivory); }
+.btn-ghost {
+  font-size: 0.72rem; font-weight: 500; color: var(--mist); background: none;
+  border: none; cursor: pointer; padding: 0.9rem 0; text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ─── PROGRESS COUNTER ───────────────────────────────────── */
+.agree-progress {
+  display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.75rem;
+  border-top: 1px solid var(--rule); background: var(--faint);
+}
+.agree-progress-bar-track { flex: 1; height: 2px; background: var(--rule); }
+.agree-progress-bar-fill { height: 100%; background: var(--res-ink); transition: width 0.3s; }
+.agree-progress-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--mist); white-space: nowrap; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .nav-inner { padding: 0 1.5rem; }
+  .progress-inner { padding: 0 1.5rem; }
+  .prog-label { display: none; }
+  .page-wrap { padding: 140px 1.5rem 4rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .domain-grid { grid-template-columns: repeat(2, 1fr); }
+  .rates-hd, .rates-row { grid-template-columns: 1fr 1fr; }
+  .rates-hd span:nth-child(3), .rates-hd span:nth-child(4),
+  .rates-row > *:nth-child(3), .rates-row > *:nth-child(4) { display: none; }
+  .sla-grid { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="nav-logotype">DD</span>
+      Deep Diligence
+    </a>
+    <button class="nav-back" onclick="history.back()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2L4 6l4 4"/></svg>
+      Back to site
+    </button>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="progress-inner">
+    <div class="prog-step active" id="prog-1" onclick="goTo(1)">
+      <span class="prog-num">01</span>
+      <span class="prog-label">Verify Identity</span>
+      <div class="prog-track"></div>
+    </div>
+    <div class="prog-step" id="prog-2" onclick="goTo(2)">
+      <span class="prog-num">02</span>
+      <span class="prog-label">Your Profile</span>
+      <div class="prog-track"></div>
+    </div>
+    <div class="prog-step" id="prog-3" onclick="goTo(3)">
+      <span class="prog-num">03</span>
+      <span class="prog-label">Agreements</span>
+      <div class="prog-track"></div>
+    </div>
+    <div class="prog-step" id="prog-4" onclick="goTo(4)">
+      <span class="prog-num">04</span>
+      <span class="prog-label">Rates &amp; SLAs</span>
+      <div class="prog-track"></div>
+    </div>
+    <div class="prog-step" id="prog-5" onclick="goTo(5)">
+      <span class="prog-num">05</span>
+      <span class="prog-label">Payment Details</span>
+      <div class="prog-track"></div>
+    </div>
+    <div class="prog-step" id="prog-6">
+      <span class="prog-num">06</span>
+      <span class="prog-label">Submitted</span>
+      <div class="prog-track"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ SCREEN 1: VERIFY IDENTITY ═══════════════════════════ -->
+<div class="page-wrap screen active" id="screen-1">
+
+  <div class="screen-eyebrow">Step 1 of 5 — Identity Verification</div>
+  <h1 class="screen-title">Verify your<br><em>academic identity</em></h1>
+  <p class="screen-sub">Deep Diligence is exclusively for active researchers at Australian universities and public research institutions. We verify your identity before approving your profile.</p>
+
+  <!-- Fraud prevention notice -->
+  <div class="verify-panel">
+    <div class="verify-panel-title">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v3M7 9.5h.01"/></svg>
+      How we verify your identity
+    </div>
+    <div class="verify-panel-body">
+      All applications are manually reviewed before approval. We cross-check three things:
+      <ul class="verify-steps">
+        <li>Your institutional email domain matches a recognised Australian university or research body</li>
+        <li>Your staff or researcher profile URL is publicly listed on your institution's website</li>
+        <li>Your ORCID iD (if provided) matches your stated publication record</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Email -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">01</span>
+      <span class="form-block-title">Institutional Email Address</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-group">
+        <label class="form-label">University / Institution Email <span class="req">*</span></label>
+        <div class="email-row" style="position:relative;">
+          <input type="email" class="form-input" id="email-input" placeholder="firstname.lastname@unsw.edu.au" oninput="validateEmail(this)" style="padding-right:7rem;">
+          <div class="email-status" id="email-status"></div>
+        </div>
+        <p class="form-hint" id="email-hint">Must be your current institutional email address. Personal Gmail, Hotmail or similar addresses will not be accepted.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Email <span class="req">*</span></label>
+        <input type="email" class="form-input" placeholder="Re-enter your institutional email">
+      </div>
+      <div style="margin-top:0.75rem;">
+        <p class="form-hint" style="margin-bottom:0.5rem;font-size:0.7rem;font-weight:500;color:var(--charcoal);">Recognised institution domains:</p>
+        <div class="domain-grid">
+          <span class="domain-tag">unsw.edu.au</span>
+          <span class="domain-tag">unimelb.edu.au</span>
+          <span class="domain-tag">sydney.edu.au</span>
+          <span class="domain-tag">anu.edu.au</span>
+          <span class="domain-tag">uq.edu.au</span>
+          <span class="domain-tag">monash.edu</span>
+          <span class="domain-tag">uwa.edu.au</span>
+          <span class="domain-tag">csiro.au</span>
+          <span class="domain-tag">ansto.gov.au</span>
+          <span class="domain-tag">curtin.edu.au</span>
+          <span class="domain-tag">adelaide.edu.au</span>
+          <span class="domain-tag">+ 38 more</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff profile URL -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">02</span>
+      <span class="form-block-title">Institutional Profile Page</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-group">
+        <label class="form-label">Staff / Researcher Profile URL <span class="req">*</span></label>
+        <input type="url" class="form-input" placeholder="https://research.unsw.edu.au/people/dr-maya-krishnamurthy">
+        <p class="form-hint">Link to your public profile on your institution's website — the page that lists your role, research interests, and publications. This is our primary identity verification check.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORCID -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">03</span>
+      <span class="form-block-title">ORCID iD</span>
+      <span class="form-block-sub">Strongly recommended</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-group">
+        <label class="form-label">ORCID iD</label>
+        <input type="text" class="form-input" placeholder="https://orcid.org/0000-0000-0000-0000">
+      </div>
+      <div class="orcid-block">
+        <div class="orcid-logo">ORCID</div>
+        <div class="orcid-text">
+          <strong>What is ORCID?</strong> ORCID is a free, globally recognised researcher identifier used by universities, journals, and funding bodies worldwide. It provides a verified, persistent link between you and your publications. If you don't have one, you can register free at <strong>orcid.org</strong> — it takes 2 minutes. Providing an ORCID iD speeds up your application review significantly.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Name and basic details -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">04</span>
+      <span class="form-block-title">Personal Details</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="Maya">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="Krishnamurthy">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Title <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select…</option>
+            <option>Dr.</option>
+            <option>Prof.</option>
+            <option>A/Prof.</option>
+            <option>Mr.</option>
+            <option>Ms.</option>
+            <option>Mx.</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Pronouns</label>
+          <input type="text" class="form-input" placeholder="e.g. she/her (optional)">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Institution <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select…</option>
+            <option>UNSW Sydney</option>
+            <option>University of Melbourne</option>
+            <option>University of Sydney</option>
+            <option>ANU</option>
+            <option>University of Queensland</option>
+            <option>Monash University</option>
+            <option>University of Western Australia</option>
+            <option>Curtin University</option>
+            <option>University of Adelaide</option>
+            <option>CSIRO</option>
+            <option>ANSTO</option>
+            <option>Other Australian institution</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Academic Level <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select…</option>
+            <option>PhD Candidate</option>
+            <option>Postdoctoral Researcher</option>
+            <option>Research Fellow</option>
+            <option>Lecturer</option>
+            <option>Senior Lecturer</option>
+            <option>Associate Professor</option>
+            <option>Professor</option>
+            <option>Principal Research Scientist</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="goTo(2)">Continue to Profile →</button>
+  </div>
+</div>
+
+
+<!-- ═══ SCREEN 2: YOUR PROFILE ══════════════════════════════ -->
+<div class="page-wrap screen" id="screen-2">
+
+  <div class="screen-eyebrow">Step 2 of 5 — Your Profile</div>
+  <h1 class="screen-title">Build your<br><em>researcher profile</em></h1>
+  <p class="screen-sub">Investment firms will review your profile before selecting you for a review. A strong profile with a photo, clear domain expertise, and recent publications significantly improves your selection rate.</p>
+
+  <!-- Photo -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">01</span>
+      <span class="form-block-title">Profile Photo</span>
+      <span class="form-block-sub">Recommended</span>
+    </div>
+    <div class="form-block-body">
+      <div class="upload-zone" id="photo-zone" onclick="simulatePhotoUpload()">
+        <div class="upload-icon">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="8" r="3"/><path d="M3 17c0-3.314 3.134-6 7-6s7 2.686 7 6"/></svg>
+        </div>
+        <div class="upload-text-block">
+          <div class="upload-label" id="photo-label">Upload a professional photo</div>
+          <div class="upload-sub">JPG or PNG, min 400×400px. Firms are more likely to select researchers with a professional headshot.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Domain expertise -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">02</span>
+      <span class="form-block-title">Domain Expertise</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-group">
+        <label class="form-label">Primary Domain <span class="req">*</span></label>
+        <select class="form-select">
+          <option value="" disabled selected>Select your primary domain…</option>
+          <option>Solar / Photovoltaics</option>
+          <option>Battery Storage / Electrochemistry</option>
+          <option>Green Hydrogen / Electrolysis</option>
+          <option>Carbon Capture &amp; Storage</option>
+          <option>Wind / Tidal Energy</option>
+          <option>Grid Technology / Smart Energy</option>
+          <option>Advanced Materials (Cleantech)</option>
+          <option>Thermal Energy Storage</option>
+          <option>Other Cleantech Domain</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">One-Liner <span class="req">*</span></label>
+        <input type="text" class="form-input" placeholder="e.g. Perovskite solar cell scientist with 11 years in next-gen PV efficiency &amp; stability">
+        <p class="form-hint">A single punchy line that sums up your expertise — the first thing firms see in the directory.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Secondary Expertise Tags</label>
+        <input type="text" class="form-input" placeholder="e.g. Perovskite, Thin Film, Materials Characterisation (comma-separated)">
+        <p class="form-hint">List specific sub-domains, techniques, or technologies you can assess. These will appear as tags on your profile.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Short Bio <span class="req">*</span></label>
+        <textarea class="form-textarea" placeholder="2–3 lines. A concise summary shown on your directory card." style="min-height:64px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Bio <span class="req">*</span></label>
+        <textarea class="form-textarea" placeholder="3–5 sentences describing your research focus, key methodologies, and what types of technologies you are best placed to assess. This is the first thing firms read when reviewing your full profile." style="min-height:110px;"></textarea>
+        <p class="form-hint">Write in third person (e.g. "Dr. Krishnamurthy's research focuses on…"). Be specific about what you can assess — this directly affects how often you are matched.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Publications & links -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">03</span>
+      <span class="form-block-title">Publications &amp; External Links</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-group">
+        <label class="form-label">Google Scholar Profile URL</label>
+        <input type="url" class="form-input" placeholder="https://scholar.google.com/citations?user=…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ResearchGate or Academia.edu Profile</label>
+        <input type="url" class="form-input" placeholder="https://www.researchgate.net/profile/…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Scopus Author ID</label>
+        <input type="text" class="form-input" placeholder="e.g. 57123456789 (optional)">
+        <p class="form-hint">Used alongside ORCID to verify your publication record during review.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">List up to 3 Key Publications <span class="req">*</span></label>
+        <textarea class="form-textarea" placeholder="Full citation for your most relevant publications. One per line. e.g.:&#10;Krishnamurthy et al. (2023). Stability-efficiency trade-offs in perovskite-silicon tandems. Nature Energy.&#10;Krishnamurthy et al. (2022). Defect passivation in high-efficiency perovskites. ACS Energy Letters." style="min-height:120px;"></textarea>
+        <p class="form-hint">These will be displayed on your profile as evidence of your domain expertise.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Personal / Lab Website</label>
+        <input type="url" class="form-input" placeholder="https://… (optional)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">LinkedIn Profile</label>
+        <input type="url" class="form-input" placeholder="https://linkedin.com/in/… (optional)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Industry Experience & Career -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">04</span>
+      <span class="form-block-title">Industry Experience &amp; Career</span>
+      <span class="form-block-sub">Strengthens your profile</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-group">
+        <label class="form-label">Consulting / Advisory Experience</label>
+        <textarea class="form-textarea" placeholder="Any prior consulting, advisory, or expert witness work — including for industry, government, or investors. (optional)" style="min-height:64px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Industry Collaborations</label>
+        <input type="text" class="form-input" placeholder="e.g. ARENA-funded projects, joint research with industry partners (optional)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Startup / Commercialisation Experience</label>
+        <input type="text" class="form-input" placeholder="e.g. spin-out founder, technical advisor to a startup, patent holder (optional)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Board / Committee Roles</label>
+        <input type="text" class="form-input" placeholder="e.g. technical advisory board, grant review panel (optional)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Career Summary</label>
+        <textarea class="form-textarea" placeholder="Bullet-point list of key organisations, roles, and projects. One per line. (optional)" style="min-height:88px;"></textarea>
+        <p class="form-hint">A concise career history shown on your full profile. Helps firms gauge the depth of your experience.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Availability -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">05</span>
+      <span class="form-block-title">Availability</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Maximum reviews per month <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select…</option>
+            <option>1 review per month</option>
+            <option>2 reviews per month</option>
+            <option>3 reviews per month</option>
+            <option>4+ reviews per month</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Engagement types you'll accept <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select…</option>
+            <option>Both (Consultation + Written Review)</option>
+            <option>Expert Consultation only ($250)</option>
+            <option>Written Review only ($2,250)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Minimum hours available per fortnight <span class="req">*</span></label>
+        <select class="form-select">
+          <option value="" disabled selected>Select…</option>
+          <option>Up to 5 hours / fortnight</option>
+          <option>5–10 hours / fortnight</option>
+          <option>10–15 hours / fortnight</option>
+          <option>15+ hours / fortnight</option>
+        </select>
+        <p class="form-hint">A realistic baseline of time you can commit. Helps us match engagement volume to your capacity.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Periods of higher availability</label>
+        <input type="text" class="form-input" placeholder="e.g. Semester breaks, sabbatical Jul–Sep (optional)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Periods of unavailability</label>
+        <input type="text" class="form-input" placeholder="e.g. Dec–Jan (summer break), conference travel in June (optional)">
+        <p class="form-hint">You can update this anytime from your dashboard. We'll pause sending you requests during these periods.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" onclick="goTo(3)">Continue to Agreements →</button>
+    <button class="btn-ghost" onclick="goTo(1)">← Back</button>
+  </div>
+</div>
+
+
+<!-- ═══ SCREEN 3: AGREEMENTS ════════════════════════════════ -->
+<div class="page-wrap screen" id="screen-3">
+
+  <div class="screen-eyebrow">Step 3 of 5 — Terms &amp; Agreements</div>
+  <h1 class="screen-title">Read and<br><em>agree to our terms</em></h1>
+  <p class="screen-sub">These agreements protect you, the investment firms, and the integrity of the platform. Please read each one carefully — these are not boilerplate.</p>
+
+  <!-- University approval notice -->
+  <div class="approval-box">
+    <div class="approval-box-title">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="10" height="9" rx="1"/><path d="M5 3V2a2 2 0 014 0v1"/><path d="M5 7h4M5 9.5h2"/></svg>
+      University Approval for Paid External Work
+    </div>
+    <div class="approval-box-body">
+      Most Australian universities require staff to obtain <strong>prior approval before undertaking paid outside work</strong> — including consulting engagements. This applies to Deep Diligence reviews. Requirements vary by institution: some require a simple notification, others a formal conflict-of-interest declaration or approval from your Head of School.<br><br>
+      <strong>You are responsible for obtaining the necessary approval from your institution before accepting any paid engagements through Deep Diligence.</strong> We recommend doing this before completing your registration. We have prepared a template letter you can use as a starting point.
+      <br>
+      <a class="template-link" href="#" onclick="return false;">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 2h8v8H2z"/><path d="M4 5h4M4 7h2"/></svg>
+        Download Template Approval Letter
+      </a>
+    </div>
+  </div>
+
+  <!-- Agreements -->
+  <div class="form-block" style="border-top-color: var(--res-ink);">
+    <div class="form-block-hd">
+      <span class="form-block-num" style="color:var(--res-ink);">T&amp;C</span>
+      <span class="form-block-title">Agreements — All items must be accepted to proceed</span>
+    </div>
+
+    <div class="agree-list" id="agree-list">
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Researcher Terms &amp; Conditions</div>
+          <div class="agree-body">I have read and agree to the Deep Diligence Researcher Terms and Conditions, including the platform's code of conduct, quality standards, dispute resolution process, and grounds for removal from the network.</div>
+          <span class="agree-tag mandatory">Mandatory</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Scope of Work — Technical Efficacy Only</div>
+          <div class="agree-body">I understand that my role is strictly limited to assessing the technical efficacy of the subject technology. I will not provide investment advice, financial product advice, or any opinion on whether a firm should invest. I understand that providing investment-related opinions may expose me to liability under the Corporations Act 2001 (Cth) and is grounds for immediate removal from the platform.</div>
+          <span class="agree-tag mandatory">Mandatory</span>
+        </div>
+      </div>
+
+      <div class="agree-item critical" onclick="toggleAgree(this, true)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Conflict of Interest — Self-Declaration Obligation</div>
+          <div class="agree-body">I understand that I have an ongoing obligation to declare conflicts of interest before accepting any review. A conflict of interest exists if I have a financial interest in the company being reviewed, am providing competing advice to a company in the same space, have a personal relationship with the founders, or have previously worked for or with the company. I agree to decline any review where a conflict exists and to declare potential conflicts proactively, even where I am uncertain. Failure to declare a conflict is grounds for immediate removal and may result in the reversal of payment.</div>
+          <span class="agree-tag mandatory">Mandatory — Ongoing obligation</span>
+        </div>
+      </div>
+
+      <div class="agree-item critical" onclick="toggleAgree(this, true)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Confidentiality &amp; NDA Obligations</div>
+          <div class="agree-body">I understand that all company materials, questions, and information shared through the platform are strictly confidential. A mutual NDA will be executed for each engagement before any information is shared. I agree that confidentiality obligations survive termination of any engagement or my removal from the platform. I will not share, publish, discuss, or use any company information for any purpose other than completing the review.</div>
+          <span class="agree-tag mandatory">Mandatory</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">University Approval Responsibility</div>
+          <div class="agree-body">I confirm that I am aware of my institution's requirements for paid outside work, and that I accept responsibility for obtaining any required approvals before accepting engagements through Deep Diligence. I understand that Deep Diligence is not responsible for any breach of my employment conditions or institutional policies.</div>
+          <span class="agree-tag important">Important</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Independence Declaration</div>
+          <div class="agree-body">I declare that my research and opinions are and will remain independent. I will not allow any prior relationship with a company, sector preference, or external pressure to influence the objectivity of my technical assessment. I understand that investment firms rely on my independence as the core value I provide.</div>
+          <span class="agree-tag mandatory">Mandatory</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Rating &amp; Quality Standards</div>
+          <div class="agree-body">I understand that investment firms will rate my work after each engagement, and that these ratings are visible on my profile. I agree that Deep Diligence may remove me from the network if my average rating falls below 3.0 over any rolling 6-month period, or if I accumulate repeated complaints about report quality, responsiveness, or professional conduct.</div>
+          <span class="agree-tag standard">Standard</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Intellectual Property Acknowledgement</div>
+          <div class="agree-body">I acknowledge that any company information, materials, and data I receive remain the intellectual property of the company being reviewed. The technical assessment I produce is provided to the requesting firm under the engagement terms. I will not claim ownership of, reuse, or build upon any company IP disclosed to me during a review.</div>
+          <span class="agree-tag important">Important</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Professional Indemnity &amp; Liability</div>
+          <div class="agree-body">I understand that I provide technical assessments in my individual capacity and am responsible for understanding my own insurance position. I confirm I will check whether my activities are covered by my institution's professional indemnity insurance or my own, and I accept that Deep Diligence does not provide professional indemnity cover for researchers. My liability is limited as set out in the Researcher Terms.</div>
+          <span class="agree-tag important">Important</span>
+        </div>
+      </div>
+
+      <div class="agree-item" onclick="toggleAgree(this)">
+        <div class="agree-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+        <div>
+          <div class="agree-title">Privacy Policy &amp; Data Handling</div>
+          <div class="agree-body">I agree to the Deep Diligence Privacy Policy. I understand that my name, institution, domain expertise, and ratings will be displayed to investment firms on the platform. My bank account details will be stored securely via Stripe and never shared. My identity will not be disclosed to third parties beyond the firms I work with on each engagement.</div>
+          <span class="agree-tag standard">Standard</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Progress indicator -->
+    <div class="agree-progress">
+      <div class="agree-progress-bar-track">
+        <div class="agree-progress-bar-fill" id="agree-bar" style="width:0%"></div>
+      </div>
+      <span class="agree-progress-label" id="agree-count">0 of 10 agreed</span>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" id="btn-agree-next" onclick="goTo(4)">Continue to Rates &amp; SLAs →</button>
+    <button class="btn-ghost" onclick="goTo(2)">← Back</button>
+  </div>
+</div>
+
+
+<!-- ═══ SCREEN 4: RATES & SLAs ═══════════════════════════════ -->
+<div class="page-wrap screen" id="screen-4">
+
+  <div class="screen-eyebrow">Step 4 of 5 — Rates &amp; Service Commitments</div>
+  <h1 class="screen-title">Rates, turnaround<br>&amp; <em>quality standards</em></h1>
+  <p class="screen-sub">These are the platform's standard rates and service level commitments. They apply to all researchers on the network. You must agree to these to proceed.</p>
+
+  <!-- Rates table -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">01</span>
+      <span class="form-block-title">Standard Rates</span>
+      <span class="form-block-sub">80% to researcher · 20% platform fee</span>
+    </div>
+    <div class="form-block-body" style="padding:0;">
+      <div class="rates-table">
+        <div class="rates-hd">
+          <span>Service</span>
+          <span>You receive</span>
+          <span>Firm pays</span>
+          <span>Est. time</span>
+        </div>
+        <div class="rates-row">
+          <div>
+            <div class="rates-service">Expert Consultation</div>
+            <div class="rates-service-sub">1-hr video call + brief written summary</div>
+          </div>
+          <div class="rates-amount">$200 <span style="font-family:'IBM Plex Sans',sans-serif;font-size:0.72rem;font-weight:300;color:var(--ash);">AUD</span></div>
+          <div class="rates-platform">$250 total</div>
+          <div class="rates-time">2–3 hrs</div>
+        </div>
+        <div class="rates-row" style="background:var(--faint);">
+          <div>
+            <div class="rates-service">Written Review + Consultation</div>
+            <div class="rates-service-sub">Structured report (10 Q&amp;A + 3 standard) + 1.5-hr call</div>
+          </div>
+          <div class="rates-amount">$1,800 <span style="font-family:'IBM Plex Sans',sans-serif;font-size:0.72rem;font-weight:300;color:var(--ash);">AUD</span></div>
+          <div class="rates-platform">$2,250 total</div>
+          <div class="rates-time">7–9 hrs</div>
+        </div>
+      </div>
+      <p style="font-size:0.72rem;color:var(--mist);padding:1rem 1.75rem;font-weight:300;line-height:1.5;">The 20% platform fee covers matching, NDA management, payment processing, and platform costs. Payment is released automatically to your nominated bank account within 2 business days of the firm accepting your deliverable. GST implications depend on your individual tax situation — you are responsible for your own tax obligations.</p>
+    </div>
+  </div>
+
+  <!-- SLA commitments -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">02</span>
+      <span class="form-block-title">Service Level Commitments</span>
+    </div>
+    <div class="form-block-body" style="padding:0;">
+      <div class="sla-grid">
+        <div class="sla-item">
+          <div class="sla-item-label">Request Response</div>
+          <div class="sla-item-value">24 hours</div>
+          <div class="sla-item-desc">You must accept or decline any review request within 24 hours of notification. Unanswered requests are automatically declined after 24 hours.</div>
+        </div>
+        <div class="sla-item">
+          <div class="sla-item-label">Written Review Delivery</div>
+          <div class="sla-item-value">5 business days</div>
+          <div class="sla-item-desc">Completed written report must be submitted within 5 business days of accepting the engagement and receiving the signed NDA.</div>
+        </div>
+        <div class="sla-item">
+          <div class="sla-item-label">Consultation Scheduling</div>
+          <div class="sla-item-value">5 business days</div>
+          <div class="sla-item-desc">The 1-hour call must be scheduled and completed within 5 business days of accepting. You provide available slots; the firm books a time.</div>
+        </div>
+        <div class="sla-item">
+          <div class="sla-item-label">Call Summary Delivery</div>
+          <div class="sla-item-value">24 hours post-call</div>
+          <div class="sla-item-desc">A brief written summary (1 page) must be submitted within 24 hours of the consultation call. This is required for all engagement types.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating impact warning -->
+  <div class="rating-warn">
+    <div class="rating-warn-title">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l1.6 3.25L12 4.85l-2.5 2.44.59 3.44L7 8.9l-3.09 1.83.59-3.44L2 4.85l3.4-.6z"/></svg>
+      How your rating is affected
+    </div>
+    <div class="rating-warn-body" style="font-size:0.8rem;color:var(--charcoal);line-height:1.65;font-weight:300;">
+      Ratings are visible to all investment firms and directly affect how often you are recommended. The following actions have specific rating impacts:
+    </div>
+    <div class="rating-factors">
+      <div class="rating-factor">
+        <span class="rating-factor-label">Declining a request after initially accepting</span>
+        <span class="rating-factor-impact high">High impact</span>
+      </div>
+      <div class="rating-factor">
+        <span class="rating-factor-label">Missing the 5-day delivery deadline</span>
+        <span class="rating-factor-impact high">High impact</span>
+      </div>
+      <div class="rating-factor">
+        <span class="rating-factor-label">Failing to schedule consultation within 5 days</span>
+        <span class="rating-factor-impact high">High impact</span>
+      </div>
+      <div class="rating-factor">
+        <span class="rating-factor-label">Not submitting call summary within 24 hours</span>
+        <span class="rating-factor-impact medium">Medium impact</span>
+      </div>
+      <div class="rating-factor">
+        <span class="rating-factor-label">Unanswered request (auto-decline after 24 hrs)</span>
+        <span class="rating-factor-impact medium">Medium impact</span>
+      </div>
+      <div class="rating-factor">
+        <span class="rating-factor-label">Report quality rated below 3/5 by firm</span>
+        <span class="rating-factor-impact high">High impact</span>
+      </div>
+      <div class="rating-factor">
+        <span class="rating-factor-label">Conflict of interest not declared proactively</span>
+        <span class="rating-factor-impact high">Grounds for removal</span>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:var(--warn);margin-top:1rem;font-weight:300;line-height:1.5;">Researchers with an average rating below 3.0 over any rolling 6-month period may be removed from the network at Deep Diligence's discretion. You will always be given 7 days notice and an opportunity to respond before any removal decision.</p>
+  </div>
+
+  <!-- Agreement checkbox -->
+  <div class="form-block" style="margin-top:1.5rem;">
+    <div class="agree-item" onclick="toggleSlaAgree(this)" id="sla-agree-item">
+      <div class="agree-checkbox" id="sla-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+      <div>
+        <div class="agree-title">I accept the rates, turnaround commitments, and rating standards above</div>
+        <div class="agree-body">I understand these are the platform's standard terms and that I cannot negotiate individual rates. I commit to the turnaround timeframes and understand the consequences of missing them on my rating.</div>
+        <span class="agree-tag mandatory">Mandatory to proceed</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" id="btn-sla-next" onclick="goTo(5)">Continue to Payment Details →</button>
+    <button class="btn-ghost" onclick="goTo(3)">← Back</button>
+  </div>
+</div>
+
+
+<!-- ═══ SCREEN 5: PAYMENT DETAILS ═══════════════════════════ -->
+<div class="page-wrap screen" id="screen-5">
+
+  <div class="screen-eyebrow">Step 5 of 5 — Payment Details</div>
+  <h1 class="screen-title">Where to send<br><em>your earnings</em></h1>
+  <p class="screen-sub">Payments are processed via Stripe and deposited directly to your nominated Australian bank account within 2 business days of a firm accepting your deliverable.</p>
+
+  <!-- Bank notice -->
+  <div class="bank-note">
+    <div class="bank-note-title">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="10" height="7" rx="1"/><path d="M5 5V3.5a2 2 0 014 0V5"/></svg>
+      Your bank details are secure
+    </div>
+    <div class="bank-note-body">Your banking information is stored encrypted via Stripe — the same payment infrastructure used by Amazon, Google, and Shopify. Deep Diligence staff cannot see your full account or BSB number. You can update your payment details at any time from your dashboard.</div>
+  </div>
+
+  <!-- Bank account -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">01</span>
+      <span class="form-block-title">Australian Bank Account</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Account Name <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="Name as it appears on your account">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bank Name <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select bank…</option>
+            <option>ANZ</option>
+            <option>Commonwealth Bank</option>
+            <option>NAB</option>
+            <option>Westpac</option>
+            <option>Macquarie</option>
+            <option>ING</option>
+            <option>Bendigo Bank</option>
+            <option>Other Australian bank</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">BSB Number <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="000-000">
+          <p class="form-hint">6-digit BSB code (e.g. 062-000)</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Account Number <span class="req">*</span></label>
+          <input type="text" class="form-input" placeholder="Account number">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tax details -->
+  <div class="form-block">
+    <div class="form-block-hd">
+      <span class="form-block-num">02</span>
+      <span class="form-block-title">Tax Information</span>
+    </div>
+    <div class="form-block-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">ABN (if applicable)</label>
+          <input type="text" class="form-input" placeholder="XX XXX XXX XXX">
+          <p class="form-hint">If you operate through an ABN, payments will be made to that entity. If you don't have an ABN, payments are made to you personally and may be subject to withholding tax.</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Are you registered for GST? <span class="req">*</span></label>
+          <select class="form-select">
+            <option value="" disabled selected>Select…</option>
+            <option>Yes — registered for GST</option>
+            <option>No — not registered for GST</option>
+            <option>Not applicable (no ABN)</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Final declaration -->
+  <div class="form-block">
+    <div class="agree-item" onclick="toggleFinalAgree(this)" id="final-agree-item">
+      <div class="agree-checkbox" id="final-checkbox"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1.5,5 4,7.5 8.5,2"/></svg></div>
+      <div>
+        <div class="agree-title">Final Declaration</div>
+        <div class="agree-body">I confirm that all information provided in this application is accurate and complete. I understand that providing false information — including misrepresenting my academic affiliation, publication record, or conflicts of interest — is grounds for immediate removal from the platform and may result in recovery of any payments made.</div>
+        <span class="agree-tag mandatory">Mandatory</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-primary" id="btn-submit" onclick="goTo(6)">Submit Application →</button>
+    <button class="btn-ghost" onclick="goTo(4)">← Back</button>
+  </div>
+</div>
+
+
+<!-- ═══ SCREEN 6: SUBMITTED ══════════════════════════════════ -->
+<div class="page-wrap screen" id="screen-6">
+  <div class="confirm-screen">
+
+    <div class="confirm-icon">
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="4,14 10,20 24,8"/></svg>
+    </div>
+
+    <div class="confirm-ref">APP-2025-RES-0147 · SUBMITTED FOR REVIEW</div>
+    <h1 class="screen-title" style="text-align:center;">Application<br><em>submitted</em></h1>
+    <p class="screen-sub" style="margin:0.75rem auto 0;text-align:center;">Thank you. Your application is now in our manual review queue. We typically review applications within 2 business days.</p>
+
+    <div class="queue-panel">
+      <div class="queue-panel-label">Manual Review Queue</div>
+      <div class="queue-panel-title">What happens next</div>
+      <div class="queue-panel-body">Every application is reviewed by a member of the Deep Diligence team before approval. This is how we maintain the quality and integrity of the researcher network.</div>
+      <div class="queue-steps">
+        <div class="queue-step">
+          <span class="queue-step-n">01</span>
+          <span class="queue-step-text"><strong>Profile verification</strong> — We check your institutional email domain, cross-reference your staff profile URL, and verify your stated affiliation. ORCID iD matched to publication record if provided.</span>
+        </div>
+        <div class="queue-step">
+          <span class="queue-step-n">02</span>
+          <span class="queue-step-text"><strong>Domain expertise review</strong> — We assess whether your stated expertise matches your publication record and institutional profile. We may reach out for clarification.</span>
+        </div>
+        <div class="queue-step">
+          <span class="queue-step-n">03</span>
+          <span class="queue-step-text"><strong>Approval email</strong> — If approved, you'll receive an email with a link to activate your researcher account, set your password, and complete Stripe identity verification for payments.</span>
+        </div>
+        <div class="queue-step">
+          <span class="queue-step-n">04</span>
+          <span class="queue-step-text"><strong>First review request</strong> — Once active, you'll receive notification when a firm's request matches your domain. You'll have 24 hours to accept or decline. No pressure, no commitment to volume.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm-next" style="margin-top:2rem;">
+      <div class="confirm-next-row">
+        <span class="confirm-next-n">NOTE 01</span>
+        <div>
+          <div class="confirm-next-title">Get your university approval in the meantime</div>
+          <div class="confirm-next-body">If you haven't already obtained approval from your institution for paid outside work, now is a good time to do so — before your first review request arrives. Your application won't be delayed by this, but you'll need approval before accepting any paid engagement.</div>
+        </div>
+      </div>
+      <div class="confirm-next-row">
+        <span class="confirm-next-n">NOTE 02</span>
+        <div>
+          <div class="confirm-next-title">Questions or need to update your application?</div>
+          <div class="confirm-next-body">Email us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f08295839591829398958283b09495958094999c9997959e9395de939f9dde9185">[email&#160;protected]</a> with your application reference number APP-2025-RES-0147. We can update any details before your application is approved.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ─── NAVIGATION ───────────────────────────────────────────
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  for (let i = 1; i <= 6; i++) {
+    const step = document.getElementById('prog-' + i);
+    step.classList.remove('active', 'done');
+    if (i < n) step.classList.add('done');
+    else if (i === n) step.classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── EMAIL VALIDATION ─────────────────────────────────────
+const VALID_DOMAINS = [
+  'unsw.edu.au', 'unimelb.edu.au', 'sydney.edu.au', 'anu.edu.au',
+  'uq.edu.au', 'monash.edu', 'uwa.edu.au', 'csiro.au', 'ansto.gov.au',
+  'curtin.edu.au', 'adelaide.edu.au', 'rmit.edu.au', 'deakin.edu.au',
+  'griffith.edu.au', 'uts.edu.au', 'latrobe.edu.au', 'newcastle.edu.au',
+  'flinders.edu.au', 'jcu.edu.au', 'cdu.edu.au', 'murdoch.edu.au',
+  'scu.edu.au', 'federation.edu.au', 'vu.edu.au', 'cqu.edu.au',
+  'usq.edu.au', 'unisa.edu.au', 'usc.edu.au', 'acu.edu.au', 'nd.edu.au'
+];
+
+function validateEmail(input) {
+  const val = input.value.trim();
+  const status = document.getElementById('email-status');
+  const hint = document.getElementById('email-hint');
+
+  if (!val) { status.className = 'email-status'; return; }
+
+  const atIndex = val.lastIndexOf('@');
+  if (atIndex < 0) { status.className = 'email-status show pending'; status.textContent = 'Enter full email'; return; }
+
+  const domain = val.substring(atIndex + 1).toLowerCase();
+  const isValid = VALID_DOMAINS.some(d => domain === d || domain.endsWith('.' + d));
+
+  if (isValid) {
+    status.className = 'email-status show valid';
+    status.textContent = '✓ Recognised';
+    input.classList.add('valid');
+    input.classList.remove('invalid');
+    hint.className = 'form-hint ok';
+    hint.textContent = 'Recognised institutional domain. ✓';
+  } else if (domain.includes('.edu.au') || domain.includes('.ac.au') || domain.includes('.gov.au')) {
+    status.className = 'email-status show pending';
+    status.textContent = 'Will be verified';
+    input.classList.remove('valid', 'invalid');
+    hint.className = 'form-hint warn';
+    hint.textContent = 'This domain isn\'t in our standard list but may still be valid. Your application will be manually reviewed.';
+  } else {
+    status.className = 'email-status show invalid';
+    status.textContent = '✗ Not recognised';
+    input.classList.add('invalid');
+    input.classList.remove('valid');
+    hint.className = 'form-hint error';
+    hint.textContent = 'This does not appear to be an institutional email address. Personal email addresses are not accepted.';
+  }
+}
+
+// ─── AGREEMENTS ───────────────────────────────────────────
+let agreeCount = 0;
+const totalAgree = 10;
+
+function toggleAgree(item, isCritical = false) {
+  const checkbox = item.querySelector('.agree-checkbox');
+  const isChecked = checkbox.classList.contains('checked');
+
+  if (isChecked) {
+    checkbox.classList.remove('checked', 'critical-check');
+    agreeCount--;
+  } else {
+    checkbox.classList.add('checked');
+    if (isCritical) checkbox.classList.add('critical-check');
+    agreeCount++;
+  }
+
+  updateAgreeProgress();
+}
+
+function updateAgreeProgress() {
+  const pct = (agreeCount / totalAgree) * 100;
+  document.getElementById('agree-bar').style.width = pct + '%';
+  document.getElementById('agree-count').textContent = agreeCount + ' of ' + totalAgree + ' agreed';
+  // validation disabled for testing
+}
+
+// ─── SLA AGREEMENT ────────────────────────────────────────
+function toggleSlaAgree(item) {
+  const checkbox = document.getElementById('sla-checkbox');
+  const isChecked = checkbox.classList.contains('checked');
+  checkbox.classList.toggle('checked', !isChecked);
+  // validation disabled for testing
+}
+
+// ─── FINAL DECLARATION ────────────────────────────────────
+function toggleFinalAgree(item) {
+  const checkbox = document.getElementById('final-checkbox');
+  const isChecked = checkbox.classList.contains('checked');
+  checkbox.classList.toggle('checked', !isChecked);
+  // validation disabled for testing
+}
+
+// ─── PHOTO UPLOAD SIMULATION ──────────────────────────────
+function simulatePhotoUpload() {
+  const zone = document.getElementById('photo-zone');
+  const label = document.getElementById('photo-label');
+  zone.classList.add('has-file');
+  label.textContent = 'headshot_photo.jpg · Uploaded ✓';
+}
+</script>
+</body>
+</html>
